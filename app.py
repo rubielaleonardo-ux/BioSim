@@ -114,14 +114,15 @@ elif simulador == "2. Mutaciones y Estructura Proteica":
 # -------------------------------------------------------------------------
 # SIMULADOR 3: Matriz de Alineamiento Global (Needleman-Wunsch simplificado)
 # -------------------------------------------------------------------------
+# -------------------------------------------------------------------------
+# SIMULADOR 3: Matriz de Alineamiento Global (Versión Simplificada)
+# -------------------------------------------------------------------------
 elif simulador == "3. Matriz de Alineamiento Global":
     st.header("3. Construcción de Matrices de Puntuación")
     seq1 = st.text_input("Secuencia Horizontal:", "AAGC").upper().strip()
     seq2 = st.text_input("Secuencia Vertical:", "AGC").upper().strip()
     
-    if not seq1 or not seq2:
-        st.info("Ingresa ambas secuencias.")
-    else:
+    if seq1 and seq2:
         seq1_format = "-" + seq1
         seq2_format = "-" + seq2
         
@@ -138,9 +139,11 @@ elif simulador == "3. Matriz de Alineamiento Global":
         df = pd.DataFrame(matriz, index=list(seq2_format), columns=list(seq1_format))
         
         st.write("**Matriz de puntuación:**")
-        # Usamos st.table para que el formato estilizado se renderice bien sin dar error
-        st.table(df.style.highlight_max(axis=None, color="#b3e5fc"))
-        st.caption("💡 Los valores más altos indican las mejores coincidencias.")
+        # Quitamos .style para eliminar el riesgo de error técnico
+        st.dataframe(df) 
+        st.caption("💡 Valores: Match=5, Mismatch=-2, Gap=-1.")
+    else:
+        st.info("Ingresa ambas secuencias para generar la matriz.")
 # -------------------------------------------------------------------------
 # SIMULADOR 4: Gráficos de De Bruijn (Genómica)
 # -------------------------------------------------------------------------
