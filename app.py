@@ -1,51 +1,39 @@
 import streamlit as st
-import pandas as pd
+# --- CONFIGURACIÓN ---
+st.set_page_config(page_title="BioSim Educativo", layout="wide")
 
-# Configuración inicial
-st.set_page_config(page_title="BioSim: Simuladores Educativos", layout="wide")
+# --- BIENVENIDA (Esto siempre se ve) ---
+st.title("🧬 BioSim: Simuladores Bioinformáticos")
+st.write("Bienvenido, identifícate para acceder a los simuladores.")
 
-# --- BIENVENIDA Y PRESENTACIÓN ---
-st.title("🧬 BioSim: Simuladores Bioinformáticos Educativos")
-st.write("""
-¡Bienvenido al portal de simulación bioinformática! 
-La bioinformática es la herramienta que nos permite comprender el lenguaje de la vida. 
-A través de estos simuladores, exploraremos procesos desde la transcripción del ADN 
-hasta la reconstrucción de genomas y el análisis evolutivo de las especies.
-""")
+# --- IDENTIFICACIÓN ---
+with st.expander("👋 ¡Haz clic aquí para identificarte!", expanded=True):
+    nombre = st.text_input("Nombre del Estudiante:", value="", key="nombre_user")
+    nivel = st.selectbox("Nivel Escolar:", ["", "1ro Secundaria", "2do Secundaria", "3ro Secundaria", "4to Secundaria", "5to Secundaria", "6to Secundaria", "Universidad"], key="nivel_user")
 
-st.write("---")
-
-# --- PANEL DE INSTRUCCIONES E IDENTIFICACIÓN ---
-with st.expander("👋 ¡Haz clic aquí para ver las instrucciones e identificarte!"):
-    st.write("### Instrucciones:")
-    st.write("1. Escribe tu nombre y selecciona tu nivel escolar.")
-    st.write("2. Una vez registrado, selecciona un simulador en el menú de la izquierda.")
-    st.write("3. Realiza la actividad y registra tus resultados.")
-    st.write("---")
+# --- TODO EL RESTO ESTÁ DENTRO DE ESTE IF ---
+# Si no han escrito nombre y nivel, esto no existe para la página.
+if nombre and nivel:
+    st.success(f"¡Hola {nombre}! Ya puedes usar los simuladores.")
     
-    nombre_estudiante = st.text_input("Nombre del Estudiante:", value="")
-    grado_escolar = st.selectbox("Nivel Escolar:", ["", "1ro Secundaria", "2do Secundaria", "3ro Secundaria", "4to Secundaria", "5to Secundaria", "6to Secundaria", "Universidad"])
-
-    if nombre_estudiante and grado_escolar:
-        st.success(f"¡Hola {nombre_estudiante} de {grado_escolar}, estamos listos para comenzar!")
-
-st.write("---")
-
-# --- LÓGICA DE ACCESO (Solo se muestra si se registró) ---
-if nombre_estudiante and grado_escolar:
-    
-    # --- MENÚ LATERAL ---
-    simulador = st.sidebar.selectbox(
-        "Selecciona un Simulador:",
-        [
+    # El menú lateral SOLO aparece aquí dentro
+    with st.sidebar:
+        simulador = st.selectbox("Selecciona un Simulador:", [
             "1. Transcripción y Traducción",
             "2. Mutaciones y Estructura Proteica",
             "3. Matriz de Alineamiento Global",
             "4. Gráficos de De Bruijn (Ensamble)",
             "5. Distancia Filogenética Básica"
-        ]
-    )
-
+        ])
+    # Aquí irían tus simuladores (dentro del if)
+    if simulador == "1. Transcripción y Traducción":
+        st.header("1. Simulador de Expresión Génica")
+        # ... tu código del simulador 1 ...
+    
+    # ... y así sucesivamente para todos ...
+else:
+    # Esto es lo único que verán si no se han identificado
+    st.info("⚠️ Por favor, ingresa tu nombre y nivel en el panel superior para habilitar el acceso.")
     # --- SIMULADOR 1 ---
     if simulador == "1. Transcripción y Traducción":
         st.header("1. Simulador de Expresión Génica")
