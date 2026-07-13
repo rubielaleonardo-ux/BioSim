@@ -112,44 +112,37 @@ elif simulador == "2. Mutaciones y Estructura Proteica":
     else:
         st.success("✅ Mutación Silenciosa: El aminoácido no cambió.")
 # -------------------------------------------------------------------------
-# SIMULADOR 3: Matriz de Alineamiento Global (Needleman-Wunsch simplificado)
+# SIMULADOR 3: Matriz de Alineamiento Global (Versión a Prueba de Errores)
 # -------------------------------------------------------------------------
 elif simulador == "3. Matriz de Alineamiento Global":
     st.header("3. Construcción de Matrices de Puntuación")
-    
-    # 1. Entradas
     seq1 = st.text_input("Secuencia Horizontal:", "AAGC").upper().strip()
     seq2 = st.text_input("Secuencia Vertical:", "AGC").upper().strip()
     
-    # 2. Validación: Solo procedemos si hay secuencias
     if seq1 and seq2:
-        seq1_format = ["-"] + list(seq1)
-        seq2_format = ["-"] + list(seq2)
+        # Creamos una lista de listas para los datos, sin índices complejos
+        # Añadimos cabeceras como primera fila
+        cabecera = [""] + ["-"] + list(seq1)
+        matriz_final = [cabecera]
         
-        # 3. Construcción de la matriz con lógica simple
-        # Usamos una lista de listas para evitar dependencias complejas de Pandas
-        matriz_datos = []
-        for char2 in seq2_format:
-            fila = []
-            for char1 in seq1_format:
-                # Puntuación simple: Match=5, Mismatch=-2, Gap=-1
-                if char1 == char2: 
-                    valor = 5
-                elif char1 == "-" or char2 == "-": 
-                    valor = -1
-                else: 
-                    valor = -2
+        seq1_list = ["-"] + list(seq1)
+        seq2_list = ["-"] + list(seq2)
+        
+        for i, char2 in enumerate(seq2_list):
+            fila = [char2] # El primer elemento es la letra de la fila
+            for char1 in seq1_list:
+                if char1 == char2: valor = 5
+                elif char1 == "-" or char2 == "-": valor = -1
+                else: valor = -2
                 fila.append(valor)
-            matriz_datos.append(fila)
+            matriz_final.append(fila)
         
-        # 4. Mostrar usando st.dataframe (es más estable que st.table)
-        df_display = pd.DataFrame(matriz_datos, index=seq2_format, columns=seq1_format)
-        
-        st.write("**Matriz de puntuación resultante:**")
-        st.dataframe(df_display, use_container_width=True)
-        st.success("¡Matriz generada correctamente!")
+        # Mostramos como tabla simple sin forzar conversión a DataFrame de Pandas
+        st.write("**Matriz de puntuación:**")
+        st.table(matriz_final) 
+        st.caption("💡 Match=5, Mismatch=-2, Gap=-1.")
     else:
-        st.info("Ingresa ambas secuencias para ver la matriz.")
+        st.info("Ingresa ambas secuencias.")
 # -------------------------------------------------------------------------
 # SIMULADOR 4: Gráficos de De Bruijn (Genómica)
 # -------------------------------------------------------------------------
