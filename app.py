@@ -16,7 +16,6 @@ simulador = st.sidebar.selectbox(
         "5. Distancia Filogenética Básica"
     ]
 )
-
 # -------------------------------------------------------------------------
 # SIMULADOR 1: Transcripción y Traducción
 # -------------------------------------------------------------------------
@@ -32,7 +31,6 @@ if simulador == "1. Transcripción y Traducción":
     else:
         # Transcripción
         arnm = adn.replace("T", "U")
-        
         # Traducción básica por codones
            # Traducción básica por codones
         # Traducción básica por codones
