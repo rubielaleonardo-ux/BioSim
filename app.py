@@ -99,6 +99,14 @@ elif simulador == "2. Mutaciones y Estructura Proteica":
     st.write(f"Comparación del codón en posición 3-5:")
     st.write(f"Original: **{codon_original}** ({traducir_codon(codon_original)})")
     st.write(f"Mutado: **{codon_mutado}** ({traducir_codon(codon_mutado)})")
+    # Función simple para traducir codones (asegúrate de tener esta lista completa)
+    def traducir_codon(c):
+        codigo = {
+            'AUG': 'Metionina', 'GGC': 'Glicina', 'GUA': 'Valina', 
+            'ACU': 'Treonina', 'UAA': 'STOP', 'CAC': 'Histidina',
+            'GAC': 'Ácido Aspártico' # <--- Agrega esto aquí
+        }
+        return codigo.get(c, "Desconocido")
     
     if codon_original != codon_mutado:
         if "STOP" in traducir_codon(codon_mutado):
