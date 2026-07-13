@@ -70,33 +70,43 @@ if simulador == "1. Transcripción y Traducción":
 # -------------------------------------------------------------------------
 elif simulador == "2. Mutaciones y Estructura Proteica":
     st.header("2. Impacto de Mutaciones Puntuales")
-    st.write("Modifica un nucleótido y observa si la proteína cambia de forma o función.")
+    st.write("Modifica un nucleótido y observa cómo cambia el aminoácido resultante.")
     
-    secuencia_original = "AUGGGCACUUAA"
-    st.write(f"**Secuencia de ARNm Original:** `{secuencia_original}` (Codifica: Met - Gly - Thr - STOP)")
+    # Usamos una secuencia base que sea fácil de analizar
+    secuencia_base = "AUGGGCACUUAA"
+    st.write(f"**ARNm Original:** `{secuencia_base}`")
     
     posicion = st.slider("Selecciona la posición para mutar (0 a 11):", 0, 11, 4)
     nuevo_nucleotido = st.selectbox("Selecciona el nuevo nucleótido:", ["A", "U", "C", "G"])
     
-    # Aplicar mutación
-    lista_arn = list(secuencia_original)
+    # Aplicar la mutación
+    lista_arn = list(secuencia_base)
     lista_arn[posicion] = nuevo_nucleotido
     secuencia_mutada = "".join(lista_arn)
     
-    st.warning(f"**Secuencia Mutada:** {secuencia_mutada[:posicion]}**{secuencia_mutada[posicion]}**{secuencia_mutada[posicion+1:]}")
+    st.warning(f"**Secuencia Mutada:** {secuencia_mutada}")
     
-    # Evaluar impacto pedagógico
-    if posicion in [3, 4, 5]: # Modificando el segundo codón (GGC -> Gly)
-        codon_mutado = secuencia_mutada[3:6]
-        if codon_mutado == "GGC":
-            st.info("🧬 **Mutación Silenciosa:** El aminoácido sigue siendo Glicina. La proteína mantiene su estructura tridimensional intacta.")
-        elif codon_mutado == "GAC":
-            st.error("🚨 **Mutación Missense (Cambio de sentido):** Cambió a Ácido Aspártico (Cargado negativamente). ¡La proteína podría plegarse mal y perder su función!")
-        else:
-            st.error(f"🚨 **Mutación Missense:** El codón ahora es {codon_mutado}. Cambia la afinidad química en esa posición de la proteína.")
-    else:
-        st.info("✨ Cambiaste otra región. Intenta cambiar la posición 4 para ver efectos en el núcleo activo.")
+    # Función simple para traducir codones (reutilizando el concepto)
+    def traducir_codon(c):
+        codigo = {'AUG': 'Metionina', 'GGC': 'Glicina', 'GUA': 'Valina', 'ACU': 'Treonina', 'UAA': 'STOP', 'CAC': 'Histidina'}
+        return codigo.get(c, "Desconocido")
 
+    # Comparación didáctica
+    codon_original = secuencia_base[3:6]
+    codon_mutado = secuencia_mutada[3:6]
+    
+    st.write("---")
+    st.write(f"Comparación del codón en posición 3-5:")
+    st.write(f"Original: **{codon_original}** ({traducir_codon(codon_original)})")
+    st.write(f"Mutado: **{codon_mutado}** ({traducir_codon(codon_mutado)})")
+    
+    if codon_original != codon_mutado:
+        if "STOP" in traducir_codon(codon_mutado):
+            st.error("🚨 ¡Mutación Nonsense! Se creó un codón de parada prematuro. La proteína será truncada (más corta).")
+        else:
+            st.info("🧬 ¡Mutación Missense! El aminoácido cambió. Esto altera la estructura de la proteína.")
+    else:
+        st.success("✅ Mutación Silenciosa: El aminoácido no cambió.")
 # -------------------------------------------------------------------------
 # SIMULADOR 3: Matriz de Alineamiento Global (Needleman-Wunsch simplificado)
 # -------------------------------------------------------------------------
