@@ -31,8 +31,7 @@ if simulador == "1. Transcripción y Traducción":
         st.error("⚠️ La secuencia solo debe contener las letras A, T, C y G.")
     else:
         # Transcripción
-        arnm = adn.replace("A", "U").replace("T", "A").replace("C", "G_temp").replace("G", "C").replace("G_temp", "G")
-        st.success(f"**ARN mensajero (5' a 3'):** {arnm}")
+        arnm = adn.replace("T", "U")
         
         # Traducción básica por codones
         codigo_genetico = {
