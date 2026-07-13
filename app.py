@@ -30,10 +30,11 @@ if simulador == "1. Transcripción y Traducción":
         arnm = "".join([transcripcion[base] for base in adn])
         st.success(f"**ARN mensajero (5' a 3'):** {arnm}")
         
-        # Diccionario ampliado
+       # Diccionario de traducción actualizado
         codigo_genetico = {
             'AUG': 'Met (Inicio)', 'GGC': 'Gly', 'AUU': 'Ile', 
-            'UAU': 'Tyr', 'ACU': 'Thr', 'UAA': 'STOP', 'CGA': 'Arg', 'GUA': 'Val'
+            'UAU': 'Tyr', 'ACU': 'Thr', 'UAA': 'STOP', 'CGA': 'Arg', 
+            'GUA': 'Val', 'CCG': 'Pro', 'AUA': 'Ile', 'UGA': 'STOP'
         }
         st.write("**Paso a paso de la Traducción:**")
         aminoacidos = []
@@ -44,7 +45,6 @@ if simulador == "1. Transcripción y Traducción":
             st.info(f"Codón **{codon}** ➡️ Aminoácido: **{aa}**")
         
         st.metric(label="Cadena Polipeptídica", value=" - ".join(aminoacidos))
-
 # -------------------------------------------------------------------------
 # El resto de tus simuladores (2 al 5) funcionan bien tal como los tenías.
 # Puedes simplemente reemplazar la sección 1 en tu archivo con este código.
