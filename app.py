@@ -12,17 +12,27 @@ with st.expander("👋 ¡Bienvenido! Haz clic aquí para ver las instrucciones e
     st.write("1. Escribe tu nombre y selecciona tu grado escolar.")
     st.write("2. Selecciona un simulador en el menú de la izquierda.")
     st.write("3. Realiza la actividad y registra tus resultados.")
-    
     st.write("---")
     
-    # Campos que aparecerán vacíos cada vez que recarguen
     nombre_estudiante = st.text_input("Nombre del Estudiante:", value="")
     grado_escolar = st.selectbox("Nivel Escolar:", ["", "1ro Secundaria", "2do Secundaria", "3ro Secundaria", "4to Secundaria", "5to Secundaria", "6to Secundaria"])
 
     if nombre_estudiante and grado_escolar:
         st.success(f"¡Hola {nombre_estudiante} de {grado_escolar}, estamos listos para comenzar!")
+
 st.write("---")
-# -------------------------------------------------------------------------
+
+# --- MENÚ LATERAL ---
+simulador = st.sidebar.selectbox(
+    "Selecciona un Simulador:",
+    [
+        "1. Transcripción y Traducción",
+        "2. Mutaciones y Estructura Proteica",
+        "3. Matriz de Alineamiento Global",
+        "4. Gráficos de De Bruijn (Ensamble)",
+        "5. Distancia Filogenética Básica"
+    ]
+)
 # SIMULADOR 1: Transcripción y Traducción (Corregido)
 # -------------------------------------------------------------------------
 if simulador == "1. Transcripción y Traducción":
