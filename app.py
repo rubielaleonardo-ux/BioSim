@@ -23,7 +23,7 @@ with st.expander("👋 ¡Bienvenido! Haz clic aquí para ver las instrucciones e
         st.success(f"¡Hola {nombre_estudiante} de {grado_escolar}, estamos listos para comenzar!")
 st.write("---")
 # Aquí debajo iría tu menú sidebar y los simuladores...
-    "Selecciona un Simulador:",
+"Selecciona un Simulador:",
     [
         "1. Transcripción y Traducción",
         "2. Mutaciones y Estructura Proteica",
