@@ -185,38 +185,43 @@ elif simulador == "4. Gráficos de De Bruijn (Ensamble)":
 # -------------------------------------------------------------------------
 elif simulador == "5. Distancia Filogenética Básica":
     st.header("5. Distancia Filogenética")
-    st.write("Compara dos secuencias para calcular su distancia evolutiva (distancia de Hamming).")
+    st.write("Compara secuencias de dos especies para medir su distancia evolutiva.")
     
-    seq_org1 = st.text_input("Secuencia Organismo 1:", "ATGCATGC").upper().strip()
-    seq_org2 = st.text_input("Secuencia Organismo 2:", "ATGCGTGC").upper().strip()
+    # Nueva entrada para nombres de especies
+    col1, col2 = st.columns(2)
+    with col1:
+        sp1 = st.text_input("Nombre Especie 1:", "Homo sapiens")
+        seq_org1 = st.text_input("Secuencia Especie 1:", "ATGCATGC").upper().strip()
+    with col2:
+        sp2 = st.text_input("Nombre Especie 2:", "Pan troglodytes")
+        seq_org2 = st.text_input("Secuencia Especie 2:", "ATGCGTGC").upper().strip()
     
     if seq_org1 and seq_org2:
         if len(seq_org1) != len(seq_org2):
-            st.error("⚠️ Error: Para comparar filogenéticamente, las secuencias deben tener la misma longitud.")
+            st.error("⚠️ Error: Las secuencias deben tener la misma longitud para compararse.")
         elif not (all(c in "ATCG" for c in seq_org1) and all(c in "ATCG" for c in seq_org2)):
-            st.error("⚠️ Error: Las secuencias solo deben contener A, T, C y G.")
+            st.error("⚠️ Error: Solo se permiten nucleótidos A, T, C y G.")
         else:
-            # Calcular diferencias (Distancia de Hamming)
+            # Cálculo de distancia
             diferencias = sum(1 for a, b in zip(seq_org1, seq_org2) if a != b)
             distancia_relativa = (diferencias / len(seq_org1)) * 100
             
             st.write("---")
-            st.write(f"**Diferencias encontradas:** {diferencias}")
+            st.write(f"### Comparación: {sp1} vs {sp2}")
+            st.write(f"**Diferencias detectadas:** {diferencias} nucleótidos distintos.")
             st.write(f"**Distancia evolutiva:** {distancia_relativa:.2f}%")
             
-            # Visualización pedagógica de las diferencias
-            comparacion = ""
-            for a, b in zip(seq_org1, seq_org2):
-                comparacion += a if a == b else f"**{b}**"
-            
-            st.write("**Mapa de variabilidad (en negrita las mutaciones):**")
+            # Mapa visual
+            comparacion = "".join([a if a == b else f"**{b}**" for a, b in zip(seq_org1, seq_org2)])
+            st.write("**Mapa de variabilidad (las diferencias están en negrita):**")
             st.code(comparacion, language="python")
             
+            # Conclusión pedagógica
             if distancia_relativa == 0:
-                st.success("✅ ¡Las secuencias son idénticas! (Especies altamente relacionadas).")
+                st.success(f"✅ Las secuencias de {sp1} y {sp2} son idénticas.")
             elif distancia_relativa < 20:
-                st.info("🧬 Diferencia baja: Evolutivamente cercanas.")
+                st.info(f"🧬 {sp1} y {sp2} muestran una relación evolutiva cercana.")
             else:
-                st.warning("⚠️ Diferencia alta: Evolutivamente distantes.")
+                st.warning(f"⚠️ {sp1} y {sp2} son evolutivamente distantes.")
     else:
-        st.info("Ingresa dos secuencias de la misma longitud para comparar.")
+        st.info("Ingresa los nombres y las secuencias de ambas especies para comenzar.")
