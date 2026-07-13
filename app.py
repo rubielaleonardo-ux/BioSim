@@ -39,7 +39,22 @@ if simulador == "1. Transcripción y Traducción":
             'AUG': 'Met (Inicio)', 'GGC': 'Gly', 'AUU': 'Ile', 
             'UAU': 'Tyr', 'ACU': 'Thr', 'UAA': 'STOP'
         }
-        
+        # Diccionario de traducción de codones a aminoácidos
+tabla_traduccion = {
+    "AUG": "Metionina",
+    "UUU": "Fenilalanina",
+    "UUC": "Fenilalanina",
+    "UUA": "Leucina",
+    "UUG": "Leucina",
+    "UCU": "Serina",
+    "UCC": "Serina",
+    "UCA": "Serina",
+    "UCG": "Serina",
+    "UAA": "STOP",
+    "UAG": "STOP",
+    "UGA": "STOP"
+    # Puedes seguir añadiendo más aquí
+}
         codones = [arnm[i:i+3] for i in range(0, len(arnm), 3)]
         st.write("**Paso a paso de la Traducción en el Ribosoma:**")
         
@@ -51,7 +66,6 @@ if simulador == "1. Transcripción y Traducción":
                 st.info(f"Codón **{c}** ➡️ Aminoácido: **{aa}**")
         
         st.metric(label="Cadena Polipeptídica Final", value=" - ".join(aminoacidos))
-
 # -------------------------------------------------------------------------
 # SIMULADOR 2: Mutaciones y Estructura Proteica
 # -------------------------------------------------------------------------
