@@ -114,31 +114,47 @@ elif simulador == "2. Mutaciones y Estructura Proteica":
 # -------------------------------------------------------------------------
 # SIMULADOR 3: Matriz de Alineamiento Global (Needleman-Wunsch simplificado)
 # -------------------------------------------------------------------------
-elif simulador == "3. Visualizador Didáctico de Matrices de Alineamiento" :
+elif simulador == "3. Matriz de Alineamiento Global":
     st.header("3. Construcción de Matrices de Puntuación")
-    st.write("Entiende la matemática detrás de los algoritmos de alineamiento global.")
+    st.write("Entiende cómo se alinean dos secuencias comparando sus caracteres.")
     
-    seq1 = "-" + st.text_input("Secuencia Horizontal 1:", "AAGC").upper()
-    seq2 = "-" + st.text_input("Secuencia Vertical 2:", "AGC").upper()
+    # Entradas de usuario
+    seq1 = st.text_input("Secuencia Horizontal:", "AAGC").upper().strip()
+    seq2 = st.text_input("Secuencia Vertical:", "AGC").upper().strip()
     
-    # Crear una matriz visual didáctica basada en coincidencias simples
-    matriz = []
-    for char2 in seq2:
-        fila = []
-        for char1 in seq1:
-            if char1 == "-" or char2 == "-":
-                fila.append(0) # Penalización de gaps simplificada
-            elif char1 == char2:
-                fila.append(5) # Match score
-            else:
-                fila.append(-2) # Mismatch score
-        matriz.append(fila)
+    if not seq1 or not seq2:
+        st.info("Por favor, ingresa ambas secuencias para calcular la matriz.")
+    elif not all(c in "ATCG" for c in seq1) or not all(c in "ATCG" for c in seq2):
+        st.error("⚠️ Error: Las secuencias solo deben contener A, T, C y G.")
+    else:
+        # Añadimos el guion al inicio para representar el espacio (gap)
+        seq1_format = "-" + seq1
+        seq2_format = "-" + seq2
         
-    df_matriz = pd.DataFrame(matriz, index=list(seq2), columns=list(seq1))
-    st.write("**Matriz de Puntuación Resultante (Match = +5, Mismatch = -2, Gap = 0):**")
-    st.dataframe(df_matriz.style.highlight_max(axis=None, color="#b3e5fc"))
-    st.caption("💡 Los valores resaltados te indican visualmente dónde coinciden los caracteres para trazar el mejor camino de alineamiento.")
-
+        # Lógica de puntuación
+        match = 5
+        mismatch = -2
+        gap = -1
+        
+        matriz = []
+        for char2 in seq2_format:
+            fila = []
+            for char1 in seq1_format:
+                if char1 == "-" and char2 == "-":
+                    fila.append(0)
+                elif char1 == "-" or char2 == "-":
+                    fila.append(gap)
+                elif char1 == char2:
+                    fila.append(match)
+                else:
+                    fila.append(mismatch)
+            matriz.append(fila)
+        
+        # Visualización
+        df = pd.DataFrame(matriz, index=list(seq2_format), columns=list(seq1_format))
+        st.write("**Matriz de puntuación (Match=5, Mismatch=-2, Gap=-1):**")
+        st.dataframe(df.style.highlight_max(axis=None, color="#b3e5fc"))
+        st.caption("💡 Los valores más altos indican las coincidencias ideales.")
 # -------------------------------------------------------------------------
 # SIMULADOR 4: Gráficos de De Bruijn (Genómica)
 # -------------------------------------------------------------------------
