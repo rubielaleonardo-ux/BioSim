@@ -183,30 +183,40 @@ elif simulador == "4. Gráficos de De Bruijn (Ensamble)":
 # -------------------------------------------------------------------------
 # SIMULADOR 5: Distancia Filogenética Básica (UPGMA)
 # -------------------------------------------------------------------------
-elif simulador == "5. Construcción de Árboles Evolutivos":
-    st.header("5. Matriz de Distancia Genética y Filogenia")
-    st.write("Modifica las distancias mutacionales para ver qué especies están más emparentadas.")
+elif simulador == "5. Distancia Filogenética Básica":
+    st.header("5. Distancia Filogenética")
+    st.write("Compara dos secuencias para calcular su distancia evolutiva (distancia de Hamming).")
     
-    st.write("Establece la distancia genética entre la Especie A, B y C:")
-    dist_AB = st.slider("Distancia entre Especie A y Especie B:", 1, 20, 4)
-    dist_AC = st.slider("Distancia entre Especie A y Especie C:", 1, 20, 12)
+    seq_org1 = st.text_input("Secuencia Organismo 1:", "ATGCATGC").upper().strip()
+    seq_org2 = st.text_input("Secuencia Organismo 2:", "ATGCGTGC").upper().strip()
     
-    st.write("**Árbol Evolutivo Representativo (Esquema de ramificación):**")
-    
-    if dist_AB < dist_AC:
-        st.code(f"""
-          ┌─── Especie A (Distancia: {dist_AB/2})
-    ──────┤
-          └─── Especie B (Distancia: {dist_AB/2})
-          │
-          └────────────────────────── Especie C (Distancia: {dist_AC})
-        """, language="text")
-        st.success("💡 Conclusión Didáctica: La Especie A y B comparten un ancestro común más reciente porque su distancia genética es menor.")
+    if seq_org1 and seq_org2:
+        if len(seq_org1) != len(seq_org2):
+            st.error("⚠️ Error: Para comparar filogenéticamente, las secuencias deben tener la misma longitud.")
+        elif not (all(c in "ATCG" for c in seq_org1) and all(c in "ATCG" for c in seq_org2)):
+            st.error("⚠️ Error: Las secuencias solo deben contener A, T, C y G.")
+        else:
+            # Calcular diferencias (Distancia de Hamming)
+            diferencias = sum(1 for a, b in zip(seq_org1, seq_org2) if a != b)
+            distancia_relativa = (diferencias / len(seq_org1)) * 100
+            
+            st.write("---")
+            st.write(f"**Diferencias encontradas:** {diferencias}")
+            st.write(f"**Distancia evolutiva:** {distancia_relativa:.2f}%")
+            
+            # Visualización pedagógica de las diferencias
+            comparacion = ""
+            for a, b in zip(seq_org1, seq_org2):
+                comparacion += a if a == b else f"**{b}**"
+            
+            st.write("**Mapa de variabilidad (en negrita las mutaciones):**")
+            st.code(comparacion, language="python")
+            
+            if distancia_relativa == 0:
+                st.success("✅ ¡Las secuencias son idénticas! (Especies altamente relacionadas).")
+            elif distancia_relativa < 20:
+                st.info("🧬 Diferencia baja: Evolutivamente cercanas.")
+            else:
+                st.warning("⚠️ Diferencia alta: Evolutivamente distantes.")
     else:
-        st.code(f"""
-          ┌─── Especie A
-    ──────┤
-          └────────────────────────── Especie B
-          │
-          └─── Especie C
-        """, language="text")
+        st.info("Ingresa dos secuencias de la misma longitud para comparar.")
