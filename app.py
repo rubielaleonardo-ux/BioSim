@@ -22,16 +22,6 @@ with st.expander("👋 ¡Bienvenido! Haz clic aquí para ver las instrucciones e
     if nombre_estudiante and grado_escolar:
         st.success(f"¡Hola {nombre_estudiante} de {grado_escolar}, estamos listos para comenzar!")
 st.write("---")
-# Aquí debajo iría tu menú sidebar y los simuladores...
-"Selecciona un Simulador:",
-    [
-        "1. Transcripción y Traducción",
-        "2. Mutaciones y Estructura Proteica",
-        "3. Matriz de Alineamiento Global",
-        "4. Gráficos de De Bruijn (Ensamble)",
-        "5. Distancia Filogenética Básica"
-    ]
-)
 # -------------------------------------------------------------------------
 # SIMULADOR 1: Transcripción y Traducción (Corregido)
 # -------------------------------------------------------------------------
