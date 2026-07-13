@@ -1,11 +1,28 @@
 import streamlit as st
 import pandas as pd
 
+# Configuración inicial
 st.set_page_config(page_title="BioSim: Simuladores Educativos", layout="wide")
+
 st.title("🧬 BioSim: Simuladores Bioinformáticos Educativos")
 
-# Menú lateral
-simulador = st.sidebar.selectbox(
+# --- PANEL DE INSTRUCCIONES E IDENTIFICACIÓN ---
+with st.expander("👋 ¡Bienvenido! Haz clic aquí para ver las instrucciones e identificarte"):
+    st.write("### Instrucciones:")
+    st.write("1. Escribe tu nombre y selecciona tu grado escolar.")
+    st.write("2. Selecciona un simulador en el menú de la izquierda.")
+    st.write("3. Realiza la actividad y registra tus resultados.")
+    
+    st.write("---")
+    
+    # Campos que aparecerán vacíos cada vez que recarguen
+    nombre_estudiante = st.text_input("Nombre del Estudiante:", value="")
+    grado_escolar = st.selectbox("Nivel Escolar:", ["", "1ro Secundaria", "2do Secundaria", "3ro Secundaria", "4to Secundaria", "5to Secundaria", "6to Secundaria"])
+
+    if nombre_estudiante and grado_escolar:
+        st.success(f"¡Hola {nombre_estudiante} de {grado_escolar}, estamos listos para comenzar!")
+st.write("---")
+# Aquí debajo iría tu menú sidebar y los simuladores...
     "Selecciona un Simulador:",
     [
         "1. Transcripción y Traducción",
