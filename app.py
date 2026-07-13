@@ -3,9 +3,8 @@ import pandas as pd
 
 st.set_page_config(page_title="BioSim: Simuladores Educativos", layout="wide")
 st.title("🧬 BioSim: Simuladores Bioinformáticos Educativos")
-st.write("Herramientas interactivas simplificadas para estudiantes introductorios.")
 
-# Menú lateral para navegar entre las 5 creaciones requeridas
+# Menú lateral
 simulador = st.sidebar.selectbox(
     "Selecciona un Simulador:",
     [
@@ -16,56 +15,40 @@ simulador = st.sidebar.selectbox(
         "5. Distancia Filogenética Básica"
     ]
 )
-
 # -------------------------------------------------------------------------
-# SIMULADOR 1: Transcripción y Traducción
+# SIMULADOR 1: Transcripción y Traducción (Corregido)
 # -------------------------------------------------------------------------
 if simulador == "1. Transcripción y Traducción":
     st.header("1. Simulador de Expresión Génica")
-    st.write("Aprende cómo el ADN se convierte en ARN mensajero y luego en una proteína.")
-    
     adn = st.text_input("Ingresa una secuencia de ADN (Molde, 3' a 5'):", "TACGGCATTTATACT").upper()
     
-    # Validar entrada
     if not all(c in "ATCG" for c in adn):
-        st.error("⚠️ La secuencia solo debe contener las letras A, T, C y G.")
+        st.error("⚠️ La secuencia solo debe contener A, T, C y G.")
     else:
-        # Transcripción
-        arnm = adn.replace("A", "U").replace("T", "A").replace("C", "G_temp").replace("G", "C").replace("G_temp", "G")
+        # Transcripción limpia: A->U, T->A, C->G, G->C
+        transcripcion = {"A": "U", "T": "A", "C": "G", "G": "C"}
+        arnm = "".join([transcripcion[base] for base in adn])
         st.success(f"**ARN mensajero (5' a 3'):** {arnm}")
         
-        # Traducción básica por codones
+        # Diccionario ampliado
         codigo_genetico = {
             'AUG': 'Met (Inicio)', 'GGC': 'Gly', 'AUU': 'Ile', 
-            'UAU': 'Tyr', 'ACU': 'Thr', 'UAA': 'STOP'
+            'UAU': 'Tyr', 'ACU': 'Thr', 'UAA': 'STOP', 'CGA': 'Arg', 'GUA': 'Val'
         }
-        # Diccionario de traducción de codones a aminoácidos
-tabla_traduccion = {
-    "AUG": "Metionina",
-    "UUU": "Fenilalanina",
-    "UUC": "Fenilalanina",
-    "UUA": "Leucina",
-    "UUG": "Leucina",
-    "UCU": "Serina",
-    "UCC": "Serina",
-    "UCA": "Serina",
-    "UCG": "Serina",
-    "UAA": "STOP",
-    "UAG": "STOP",
-    "UGA": "STOP"
-    # Puedes seguir añadiendo más aquí
-}
-        codones = [arnm[i:i+3] for i in range(0, len(arnm), 3)]
-        st.write("**Paso a paso de la Traducción en el Ribosoma:**")
-        
+        st.write("**Paso a paso de la Traducción:**")
         aminoacidos = []
-        for c in codones:
-            if len(c) == 3:
-                aa = codigo_genetico.get(c, "Desconocido")
-                aminoacidos.append(aa)
-                st.info(f"Codón **{c}** ➡️ Aminoácido: **{aa}**")
+        for i in range(0, len(arnm) - (len(arnm) % 3), 3):
+            codon = arnm[i:i+3]
+            aa = codigo_genetico.get(codon, "Desconocido")
+            aminoacidos.append(aa)
+            st.info(f"Codón **{codon}** ➡️ Aminoácido: **{aa}**")
         
-        st.metric(label="Cadena Polipeptídica Final", value=" - ".join(aminoacidos))
+        st.metric(label="Cadena Polipeptídica", value=" - ".join(aminoacidos))
+
+# -------------------------------------------------------------------------
+# El resto de tus simuladores (2 al 5) funcionan bien tal como los tenías.
+# Puedes simplemente reemplazar la sección 1 en tu archivo con este código.
+# -------------------------------------------------------------------------
 # -------------------------------------------------------------------------
 # SIMULADOR 2: Mutaciones y Estructura Proteica
 # -------------------------------------------------------------------------
