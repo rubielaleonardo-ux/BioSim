@@ -43,7 +43,6 @@ if simulador == "1. Transcripción y Traducción":
         'UAC': 'Tyr',
         'ACU': 'Thr',
         'UAA': 'STOP'
-    }
         codones = [arnm[i:i+3] for i in range(0, len(arnm), 3)]
         st.write("**Paso a paso de la Traducción en el Ribosoma:**")
         
