@@ -147,28 +147,39 @@ elif simulador == "3. Matriz de Alineamiento Global":
 # SIMULADOR 4: Ensamble de Fragmentos (K-meros)
 # -------------------------------------------------------------------------
 elif simulador == "4. Gráficos de De Bruijn (Ensamble)":
-    st.header("4. Ensamble mediante K-meros")
-    st.write("Divide una secuencia en fragmentos de tamaño 'k' para simular el proceso de secuenciación.")
+    st.header("4. Ensamble mediante Grafos de De Bruijn")
+    st.write("Entiende cómo se reconstruye el genoma uniendo fragmentos (k-meros).")
     
-    secuencia = st.text_input("Ingresa la secuencia de ADN:", "ATGCTAGC").upper().strip()
-    k = st.slider("Tamaño del fragmento (k):", 2, 5, 3)
+    secuencia = st.text_input("Ingresa la secuencia de ADN:", "ATGCATGC").upper().strip()
+    k = st.slider("Tamaño del fragmento (k):", 2, 4, 3)
     
-    if not secuencia:
-        st.info("Por favor, ingresa una secuencia de ADN.")
-    elif len(secuencia) < k:
-        st.warning(f"⚠️ La secuencia es más corta que el tamaño k ({k}).")
-    elif not all(c in "ATCG" for c in secuencia):
-        st.error("⚠️ Error: La secuencia solo debe contener A, T, C y G.")
-    else:
-        # Generar los k-meros
-        fragmentos = [secuencia[i:i+k] for i in range(len(secuencia) - k + 1)]
+    if secuencia and len(secuencia) >= k:
+        # Generar k-meros
+        kmeros = [secuencia[i:i+k] for i in range(len(secuencia) - k + 1)]
+        st.write(f"**Fragmentos (k={k}):** `{kmeros}`")
         
-        st.write(f"**Fragmentos generados (k={k}):**")
-        st.write(fragmentos) # Usamos st.write para que se vea directo
-        
+        # Construcción básica del Grafo de De Bruijn
+        # Un nodo es (k-1)-mer, una arista es un k-mer
+        nodos = set()
+        aristas = []
+        for km in kmeros:
+            prefijo = km[:-1]
+            sufijo = km[1:]
+            nodos.add(prefijo)
+            nodos.add(sufijo)
+            aristas.append((prefijo, sufijo))
+            
         st.write("---")
-        st.subheader("Concepto pedagógico")
-        st.write("Este simulador ayuda a ver cómo se fragmenta el ADN para su análisis.")
+        st.subheader("Grafo de De Bruijn simplificado:")
+        st.write("El ensamble consiste en encontrar un camino que recorra todas las conexiones.")
+        
+        # Mostrar conexiones (nodos y aristas)
+        for origen, destino in aristas:
+            st.write(f"Nodo `{origen}` ➔ Nodo `{destino}` (vía fragmento `{origen}{destino[-1]}`)")
+            
+        st.info("💡 En la bioinformática real, el ensamble busca el 'camino euleriano' para reconstruir la secuencia completa.")
+    else:
+        st.warning("Ingresa una secuencia válida (mínimo longitud de k).")
 # -------------------------------------------------------------------------
 # SIMULADOR 5: Distancia Filogenética Básica (UPGMA)
 # -------------------------------------------------------------------------
