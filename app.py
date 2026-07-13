@@ -68,30 +68,34 @@ if simulador == "1. Transcripción y Traducción":
 # -------------------------------------------------------------------------
 # SIMULADOR 2: Mutaciones y Estructura Proteica
 # -------------------------------------------------------------------------
+# -------------------------------------------------------------------------
+# SIMULADOR 2: Mutaciones y Estructura Proteica (Actualizado)
+# -------------------------------------------------------------------------
 elif simulador == "2. Mutaciones y Estructura Proteica":
     st.header("2. Impacto de Mutaciones Puntuales")
     st.write("Modifica un nucleótido y observa cómo cambia el aminoácido resultante.")
     
-    # Usamos una secuencia base que sea fácil de analizar
     secuencia_base = "AUGGGCACUUAA"
     st.write(f"**ARNm Original:** `{secuencia_base}`")
     
     posicion = st.slider("Selecciona la posición para mutar (0 a 11):", 0, 11, 4)
     nuevo_nucleotido = st.selectbox("Selecciona el nuevo nucleótido:", ["A", "U", "C", "G"])
     
-    # Aplicar la mutación
     lista_arn = list(secuencia_base)
     lista_arn[posicion] = nuevo_nucleotido
     secuencia_mutada = "".join(lista_arn)
     
     st.warning(f"**Secuencia Mutada:** {secuencia_mutada}")
     
-    # Función simple para traducir codones (reutilizando el concepto)
+    # Esta es la lista que tienes que actualizar
     def traducir_codon(c):
-        codigo = {'AUG': 'Metionina', 'GGC': 'Glicina', 'GUA': 'Valina', 'ACU': 'Treonina', 'UAA': 'STOP', 'CAC': 'Histidina'}
+        codigo = {
+            'AUG': 'Metionina', 'GGC': 'Glicina', 'GUA': 'Valina', 
+            'ACU': 'Treonina', 'UAA': 'STOP', 'CAC': 'Histidina',
+            'GAC': 'Ácido Aspártico', 'GAA': 'Ácido Glutámico', 'GCU': 'Alanina'
+        }
         return codigo.get(c, "Desconocido")
 
-    # Comparación didáctica
     codon_original = secuencia_base[3:6]
     codon_mutado = secuencia_mutada[3:6]
     
@@ -99,18 +103,10 @@ elif simulador == "2. Mutaciones y Estructura Proteica":
     st.write(f"Comparación del codón en posición 3-5:")
     st.write(f"Original: **{codon_original}** ({traducir_codon(codon_original)})")
     st.write(f"Mutado: **{codon_mutado}** ({traducir_codon(codon_mutado)})")
-    # Función simple para traducir codones (asegúrate de tener esta lista completa)
-    def traducir_codon(c):
-        codigo = {
-            'AUG': 'Metionina', 'GGC': 'Glicina', 'GUA': 'Valina', 
-            'ACU': 'Treonina', 'UAA': 'STOP', 'CAC': 'Histidina',
-            'GAC': 'Ácido Aspártico' # <--- Agrega esto aquí
-        }
-        return codigo.get(c, "Desconocido")
     
     if codon_original != codon_mutado:
         if "STOP" in traducir_codon(codon_mutado):
-            st.error("🚨 ¡Mutación Nonsense! Se creó un codón de parada prematuro. La proteína será truncada (más corta).")
+            st.error("🚨 ¡Mutación Nonsense! Se creó un codón de parada prematuro.")
         else:
             st.info("🧬 ¡Mutación Missense! El aminoácido cambió. Esto altera la estructura de la proteína.")
     else:
