@@ -116,45 +116,31 @@ elif simulador == "2. Mutaciones y Estructura Proteica":
 # -------------------------------------------------------------------------
 elif simulador == "3. Matriz de Alineamiento Global":
     st.header("3. Construcción de Matrices de Puntuación")
-    st.write("Entiende cómo se alinean dos secuencias comparando sus caracteres.")
-    
-    # Entradas de usuario
     seq1 = st.text_input("Secuencia Horizontal:", "AAGC").upper().strip()
     seq2 = st.text_input("Secuencia Vertical:", "AGC").upper().strip()
     
     if not seq1 or not seq2:
-        st.info("Por favor, ingresa ambas secuencias para calcular la matriz.")
-    elif not all(c in "ATCG" for c in seq1) or not all(c in "ATCG" for c in seq2):
-        st.error("⚠️ Error: Las secuencias solo deben contener A, T, C y G.")
+        st.info("Ingresa ambas secuencias.")
     else:
-        # Añadimos el guion al inicio para representar el espacio (gap)
         seq1_format = "-" + seq1
         seq2_format = "-" + seq2
-        
-        # Lógica de puntuación
-        match = 5
-        mismatch = -2
-        gap = -1
         
         matriz = []
         for char2 in seq2_format:
             fila = []
             for char1 in seq1_format:
-                if char1 == "-" and char2 == "-":
-                    fila.append(0)
-                elif char1 == "-" or char2 == "-":
-                    fila.append(gap)
-                elif char1 == char2:
-                    fila.append(match)
-                else:
-                    fila.append(mismatch)
+                if char1 == "-" and char2 == "-": fila.append(0)
+                elif char1 == "-" or char2 == "-": fila.append(-1)
+                elif char1 == char2: fila.append(5)
+                else: fila.append(-2)
             matriz.append(fila)
         
-        # Visualización
         df = pd.DataFrame(matriz, index=list(seq2_format), columns=list(seq1_format))
-        st.write("**Matriz de puntuación (Match=5, Mismatch=-2, Gap=-1):**")
-        st.dataframe(df.style.highlight_max(axis=None, color="#b3e5fc"))
-        st.caption("💡 Los valores más altos indican las coincidencias ideales.")
+        
+        st.write("**Matriz de puntuación:**")
+        # Usamos st.table para que el formato estilizado se renderice bien sin dar error
+        st.table(df.style.highlight_max(axis=None, color="#b3e5fc"))
+        st.caption("💡 Los valores más altos indican las mejores coincidencias.")
 # -------------------------------------------------------------------------
 # SIMULADOR 4: Gráficos de De Bruijn (Genómica)
 # -------------------------------------------------------------------------
