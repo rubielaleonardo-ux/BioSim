@@ -51,11 +51,15 @@ if simulador == "1. Transcripción y Traducción":
         }
         st.write("**Paso a paso de la Traducción:**")
         aminoacidos = []
+        if len(arnm) % 3 != 0:
+            st.warning(f"⚠️ Atención: Tu secuencia de ARN tiene {len(arnm)} nucleótidos. Los últimos {len(arnm) % 3} no forman un codón completo y serán ignorados.")
+        
         for i in range(0, len(arnm) - (len(arnm) % 3), 3):
             codon = arnm[i:i+3]
             aa = codigo_genetico.get(codon, "Desconocido")
             aminoacidos.append(aa)
             st.info(f"Codón **{codon}** ➡️ Aminoácido: **{aa}**")
+        
         st.metric(label="Cadena Polipeptídica", value=" - ".join(aminoacidos))
 # -------------------------------------------------------------------------
 # El resto de tus simuladores (2 al 5) funcionan bien tal como los tenías.
