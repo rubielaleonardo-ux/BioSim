@@ -146,7 +146,7 @@ elif simulador == "3. Matriz de Alineamiento Global":
 # -------------------------------------------------------------------------
 # SIMULADOR 4: Ensamble de Fragmentos (K-meros)
 # -------------------------------------------------------------------------
-elif simulador == "4. Simulador de Ensamble de Fragmentos":
+elif simulador == "4. Gráficos de De Bruijn (Ensamble)":
     st.header("4. Ensamble mediante K-meros")
     st.write("Divide una secuencia en fragmentos de tamaño 'k' para simular el proceso de secuenciación.")
     
