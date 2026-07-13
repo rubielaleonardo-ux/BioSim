@@ -156,7 +156,7 @@ elif simulador == "4. Simulador de Ensamble de Fragmentos":
     if not secuencia:
         st.info("Por favor, ingresa una secuencia de ADN.")
     elif len(secuencia) < k:
-        st.warning(f"⚠️ La secuencia es más corta que el tamaño k ({k}). ¡No se pueden formar fragmentos!")
+        st.warning(f"⚠️ La secuencia es más corta que el tamaño k ({k}).")
     elif not all(c in "ATCG" for c in secuencia):
         st.error("⚠️ Error: La secuencia solo debe contener A, T, C y G.")
     else:
@@ -164,14 +164,11 @@ elif simulador == "4. Simulador de Ensamble de Fragmentos":
         fragmentos = [secuencia[i:i+k] for i in range(len(secuencia) - k + 1)]
         
         st.write(f"**Fragmentos generados (k={k}):**")
-        st.code(str(fragmentos), language="python")
+        st.write(fragmentos) # Usamos st.write para que se vea directo
         
         st.write("---")
         st.subheader("Concepto pedagógico")
-        st.write("""
-        En la bioinformática real, el ensamble de genomas utiliza algoritmos complejos para unir estos fragmentos. 
-        Este simulador te ayuda a ver cómo la **cobertura** y el **tamaño de k** influyen en la reconstrucción.
-        """)
+        st.write("Este simulador ayuda a ver cómo se fragmenta el ADN para su análisis.")
 # -------------------------------------------------------------------------
 # SIMULADOR 5: Distancia Filogenética Básica (UPGMA)
 # -------------------------------------------------------------------------
