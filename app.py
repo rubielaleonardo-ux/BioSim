@@ -144,26 +144,34 @@ elif simulador == "3. Matriz de Alineamiento Global":
     else:
         st.info("Ingresa ambas secuencias.")
 # -------------------------------------------------------------------------
-# SIMULADOR 4: Gráficos de De Bruijn (Genómica)
+# SIMULADOR 4: Ensamble de Fragmentos (K-meros)
 # -------------------------------------------------------------------------
-elif simulador == "4. Simulador de Ensamble de Fragmentos" :
-    st.header("4. Ensamble de Genomas mediante K-meros")
-    st.write("Divide una secuencia en fragmentos pequeños (k-meros) para entender cómo el software reconstruye un genoma.")
+elif simulador == "4. Simulador de Ensamble de Fragmentos":
+    st.header("4. Ensamble mediante K-meros")
+    st.write("Divide una secuencia en fragmentos de tamaño 'k' para simular el proceso de secuenciación.")
     
-    secuencia_completa = st.text_input("Secuencia de Genoma Referencia:", "ATGCTAGC").upper()
-    k = st.slider("Tamaño del K-mero (Longitud de ventana):", 2, 4, 3)
+    secuencia = st.text_input("Ingresa la secuencia de ADN:", "ATGCTAGC").upper().strip()
+    k = st.slider("Tamaño del fragmento (k):", 2, 5, 3)
     
-    # Generar fragmentos (k-meros)
-    kmeros = [secuencia_completa[i:i+k] for i in range(len(secuencia_completa) - k + 1)]
-    st.write(f"**Fragmentos generados (`{k}-meros`):** {kmeros}")
-    
-    st.write("**Flujo Lógico del Ensamble (Unión por solapamiento):**")
-    for i in range(len(kmeros)-1):
-        prefijo = kmeros[i][1:]
-        sufijo = kmeros[i+1][:-1]
-        if prefijo == sufijo:
-            st.write(f"🟢 El fragmento `{kmeros[i]}` se conecta con `{kmeros[i+1]}` a través del solapamiento **'{prefijo}'**")
-
+    if not secuencia:
+        st.info("Por favor, ingresa una secuencia de ADN.")
+    elif len(secuencia) < k:
+        st.warning(f"⚠️ La secuencia es más corta que el tamaño k ({k}). ¡No se pueden formar fragmentos!")
+    elif not all(c in "ATCG" for c in secuencia):
+        st.error("⚠️ Error: La secuencia solo debe contener A, T, C y G.")
+    else:
+        # Generar los k-meros
+        fragmentos = [secuencia[i:i+k] for i in range(len(secuencia) - k + 1)]
+        
+        st.write(f"**Fragmentos generados (k={k}):**")
+        st.code(str(fragmentos), language="python")
+        
+        st.write("---")
+        st.subheader("Concepto pedagógico")
+        st.write("""
+        En la bioinformática real, el ensamble de genomas utiliza algoritmos complejos para unir estos fragmentos. 
+        Este simulador te ayuda a ver cómo la **cobertura** y el **tamaño de k** influyen en la reconstrucción.
+        """)
 # -------------------------------------------------------------------------
 # SIMULADOR 5: Distancia Filogenética Básica (UPGMA)
 # -------------------------------------------------------------------------
