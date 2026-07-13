@@ -34,16 +34,16 @@ if simulador == "1. Transcripción y Traducción":
         arnm = adn.replace("T", "U")
         
         # Traducción básica por codones
-            codigo_genetico = {
-    'AUG': 'Met (Inicio)', 
-    'GGC': 'Gly', 
-    'AUU': 'Ile',
-    'UAU': 'Tyr', 
-    'ACU': 'Thr', 
-    'UAA': 'STOP',
-    'UAC': 'Tyr'  # <-- Agrega esta línea
-}
-        
+           # Traducción básica por codones
+    codigo_genetico = {
+        'AUG': 'Met (Inicio)',
+        'GGC': 'Gly',
+        'AUU': 'Ile',
+        'UAU': 'Tyr',
+        'UAC': 'Tyr',
+        'ACU': 'Thr',
+        'UAA': 'STOP'
+    }
         codones = [arnm[i:i+3] for i in range(0, len(arnm), 3)]
         st.write("**Paso a paso de la Traducción en el Ribosoma:**")
         
