@@ -50,10 +50,15 @@ if simulador == "1. Transcripción y Traducción":
         aminoacidos = []
         for c in codones:
             if len(c) == 3:
-                aa = codigo_genetico.get(c, "Desconocido")
-                aminoacidos.append(aa)
-                st.info(f"Codón **{c}** ➡️ Aminoácido: **{aa}**")
-        
+                codigo_genetico = {
+    'AUG': 'Met (Inicio)', 
+    'GGC': 'Gly', 
+    'AUU': 'Ile',
+    'UAU': 'Tyr', 
+    'ACU': 'Thr', 
+    'UAA': 'STOP',
+    'UAC': 'Tyr'  # <-- Agrega esta línea
+}
         st.metric(label="Cadena Polipeptídica Final", value=" - ".join(aminoacidos))
 
 # -------------------------------------------------------------------------
