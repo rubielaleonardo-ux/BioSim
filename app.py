@@ -16,18 +16,20 @@ hasta la reconstrucción de genomas y el análisis evolutivo de las especies.
 st.write("---")
 
 # --- PANEL DE INSTRUCCIONES E IDENTIFICACIÓN ---
-with st.expander("👋 ¡Haz clic aquí para ver las instrucciones e identificarte!"):
+with st.expander("👋 ¡Haz clic aquí para ver las instrucciones e identificarte!", expanded=True):
     st.write("### Instrucciones:")
     st.write("1. Escribe tu nombre y selecciona tu nivel escolar.")
     st.write("2. Una vez registrado, selecciona un simulador en el menú de la izquierda.")
     st.write("3. Realiza la actividad y registra tus resultados.")
     st.write("---")
     
-    nombre_estudiante = st.text_input("Nombre del Estudiante:", value="")
-    grado_escolar = st.selectbox("Nivel Escolar:", ["", "1ro Secundaria", "2do Secundaria", "3ro Secundaria", "4to Secundaria", "5to Secundaria", "6to Secundaria", "Universidad"])
+    nombre_estudiante = st.text_input("Nombre del Estudiante:", value="", key="nombre_input")
+    grado_escolar = st.selectbox("Nivel Escolar:", ["", "1ro Secundaria", "2do Secundaria", "3ro Secundaria", "4to Secundaria", "5to Secundaria", "6to Secundaria", "Universidad"], key="grado_input")
 
     if nombre_estudiante and grado_escolar:
         st.success(f"¡Hola {nombre_estudiante} de {grado_escolar}, estamos listos para comenzar!")
+    else:
+        st.info("⚠️ Por favor, ingresa tu nombre y grado para habilitar los simuladores.")
 
 st.write("---")
 
@@ -153,6 +155,3 @@ if nombre_estudiante and grado_escolar:
         if s1 and s2 and len(s1) == len(s2):
             diff = sum(1 for a, b in zip(s1, s2) if a != b)
             st.write(f"Distancia: {(diff / len(s1)) * 100:.2f}%")
-
-else:
-    st.info("👆 Por favor, ingresa tu nombre y nivel en el panel de arriba para habilitar los simuladores.")
