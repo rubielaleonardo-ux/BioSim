@@ -141,5 +141,5 @@ else:
         if s1 and s2 and len(s1) == len(s2):
             diff = sum(1 for a, b in zip(s1, s2) if a != b)
             st.write(f"Distancia: {(diff / len(s1)) * 100:.2f}%")
-else:
+    else:
     st.info("👆 Por favor, ingresa tu nombre y nivel en el panel de arriba para habilitar los simuladores.")
