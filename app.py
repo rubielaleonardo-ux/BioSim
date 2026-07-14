@@ -1,8 +1,9 @@
 import streamlit as st
+
 # --- CONFIGURACIÓN ---
 st.set_page_config(page_title="BioSim Educativo", layout="wide")
 
-# --- BIENVENIDA (Esto siempre se ve) ---
+# --- BIENVENIDA ---
 st.title("🧬 BioSim: Simuladores Bioinformáticos")
 st.write("Bienvenido, identifícate para acceder a los simuladores.")
 
@@ -11,12 +12,11 @@ with st.expander("👋 ¡Haz clic aquí para identificarte!", expanded=True):
     nombre = st.text_input("Nombre del Estudiante:", value="", key="nombre_user")
     nivel = st.selectbox("Nivel Escolar:", ["", "1ro Secundaria", "2do Secundaria", "3ro Secundaria", "4to Secundaria", "5to Secundaria", "6to Secundaria", "Universidad"], key="nivel_user")
 
-# --- TODO EL RESTO ESTÁ DENTRO DE ESTE IF ---
-# Si no han escrito nombre y nivel, esto no existe para la página.
+# --- LÓGICA DE ACCESO ---
 if nombre and nivel:
     st.success(f"¡Hola {nombre}! Ya puedes usar los simuladores.")
     
-    # El menú lateral SOLO aparece aquí dentro
+    # Menú lateral dentro del IF de acceso
     with st.sidebar:
         simulador = st.selectbox("Selecciona un Simulador:", [
             "1. Transcripción y Traducción",
@@ -25,15 +25,7 @@ if nombre and nivel:
             "4. Gráficos de De Bruijn (Ensamble)",
             "5. Distancia Filogenética Básica"
         ])
-    # Aquí irían tus simuladores (dentro del if)
-    if simulador == "1. Transcripción y Traducción":
-        st.header("1. Simulador de Expresión Génica")
-        # ... tu código del simulador 1 ...
-    
-    # ... y así sucesivamente para todos ...
-else:
-    # Esto es lo único que verán si no se han identificado
-    st.info("⚠️ Por favor, ingresa tu nombre y nivel en el panel superior para habilitar el acceso.")
+
     # --- SIMULADOR 1 ---
     if simulador == "1. Transcripción y Traducción":
         st.header("1. Simulador de Expresión Génica")
@@ -141,5 +133,6 @@ else:
         if s1 and s2 and len(s1) == len(s2):
             diff = sum(1 for a, b in zip(s1, s2) if a != b)
             st.write(f"Distancia: {(diff / len(s1)) * 100:.2f}%")
-    else:
-    st.info("👆 Por favor, ingresa tu nombre y nivel en el panel de arriba para habilitar los simuladores.")
+
+else:
+    st.info("⚠️ Por favor, ingresa tu nombre y nivel en el panel superior para habilitar el acceso.")
