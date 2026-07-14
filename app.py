@@ -41,9 +41,9 @@ codigo_genetico = {
 }
 
 # --- IDENTIFICACIÓN ---
-st.title("🧬 BioSim: Simuladores Bioinformáticos")
+st.title("🧬 BioSim: Laboratorio Virtual")
 with st.expander("👋 ¡Identifícate para comenzar!", expanded=True):
-    nombre = st.text_input("Nombre del Estudiante:")
+    nombre = st.text_input("Nombre del Estudiante:", value="")
     nivel = st.selectbox("Nivel Escolar:", ["", "Secundaria", "Universidad"])
 
 if nombre and nivel:
@@ -54,8 +54,8 @@ if nombre and nivel:
     # --- SIMULADOR 1 ---
     if simulador == "1. Transcripción y Traducción":
         st.header("1. Transcripción y Traducción de ADN")
-        st.info("Instrucciones: Escribe una secuencia de ADN. El sistema realizará la transcripción a ARNm (usando complementariedad) y luego traducirá los codones a aminoácidos.")
-        adn = st.text_input("Secuencia ADN (3' a 5'):", "TACGGCATTTATACT").upper().strip()
+        st.info("INSTRUCCIONES: Ingresa una secuencia de ADN molde (ej. TACGGCATTTATACT) y presiona ENTER. Observa cómo se convierte en ARNm y qué aminoácidos produce.")
+        adn = st.text_input("Ingresa ADN (3' a 5'):", value="")
         if all(c in "ATCG" for c in adn) and adn:
             transc = {"A": "U", "T": "A", "C": "G", "G": "C"}
             arnm = "".join([transc.get(b, "") for b in adn])
@@ -67,22 +67,22 @@ if nombre and nivel:
     # --- SIMULADOR 2 ---
     elif simulador == "2. Mutaciones y Estructura Proteica":
         st.header("2. Impacto de Mutaciones")
-        st.info("Instrucciones: Elige una posición en el ARNm base y cambia el nucleótido para observar si la proteína resultante cambia (Missense), se detiene prematuramente (Nonsense) o se mantiene igual (Silenciosa).")
-        sec_base = "AUGGGCACUUAA"
-        pos = st.slider("Posición para alterar:", 0, 11, 4)
-        nuc = st.selectbox("Nuevo nucleótido:", ["A", "U", "C", "G"])
-        mut_seq = list(sec_base); mut_seq[pos] = nuc; mut_seq = "".join(mut_seq)
-        st.write(f"ARNm original: `{sec_base}` | ARNm mutado: `{mut_seq}`")
+        st.info("INSTRUCCIONES: Escribe una secuencia de ARNm, selecciona una posición y cambia el nucleótido. Analiza si la proteína resultante cambia o se detiene.")
+        sec_base = st.text_input("Ingresa ARNm base (ej. AUGGGCACUUAA):", value="")
+        if sec_base:
+            pos = st.slider("Posición para alterar:", 0, len(sec_base)-1, 0)
+            nuc = st.selectbox("Nuevo nucleótido:", ["A", "U", "C", "G"])
+            mut_seq = list(sec_base); mut_seq[pos] = nuc; mut_seq = "".join(mut_seq)
+            st.warning(f"ARNm original: `{sec_base}` | ARNm mutado: `{mut_seq}`")
         if st.button("➡️ Siguiente: Matrices"): ir_al_siguiente(); st.rerun()
 
     # --- SIMULADOR 3 ---
     elif simulador == "3. Matriz de Alineamiento Global":
         st.header("3. Matriz de Puntuación")
-        st.info("Instrucciones: Compara dos secuencias cortas. Usaremos una regla simple: +5 por coincidencia, -2 por desajuste y -1 por espacios (gaps).")
-        s1 = st.text_input("Seq Horizontal:", "AAGC").upper().strip()
-        s2 = st.text_input("Seq Vertical:", "AGC").upper().strip()
+        st.info("INSTRUCCIONES: Ingresa dos secuencias de ADN para comparar. El simulador generará una matriz de alineamiento basada en coincidencias (+5) y desajustes (-1).")
+        s1 = st.text_input("Secuencia Horizontal:", value="")
+        s2 = st.text_input("Secuencia Vertical:", value="")
         if s1 and s2:
-            st.write("Matriz de puntuación resultante:")
             matriz = [[""] + ["-"] + list(s1)] + [[c2] + [5 if c1==c2 else -1 for c1 in ["-"]+list(s1)] for c2 in ["-"]+list(s2)]
             st.table(matriz)
         if st.button("➡️ Siguiente: Grafos"): ir_al_siguiente(); st.rerun()
@@ -90,21 +90,22 @@ if nombre and nivel:
     # --- SIMULADOR 4 ---
     elif simulador == "4. Gráficos de De Bruijn (Ensamble)":
         st.header("4. Ensamble de ADN mediante Grafos")
-        st.info("Instrucciones: Un ensamble bioinformático divide el ADN en fragmentos pequeños (k-mers). Cambia 'k' para ver cómo se conectan los fragmentos.")
-        seq = st.text_input("Secuencia ADN:", "ATGCATGC").upper().strip()
-        k = st.slider("Tamaño de fragmento (k):", 2, 4, 3)
-        if seq and len(seq) >= k:
-            kmers = [seq[i:i+k] for i in range(len(seq) - k + 1)]
-            st.write(f"Fragmentos generados: {kmers}")
-            for km in kmers: st.write(f"Nodo `{km[:-1]}` ➔ Nodo `{km[1:]}`")
+        st.info("INSTRUCCIONES: Ingresa una secuencia larga y elige un tamaño 'k'. El sistema fragmentará el ADN en 'k-mers' para visualizar el grafo de ensamble.")
+        seq = st.text_input("Ingresa ADN para ensamblar:", value="")
+        if seq:
+            k = st.slider("Tamaño de fragmento (k):", 2, 5, 3)
+            if len(seq) >= k:
+                kmers = [seq[i:i+k] for i in range(len(seq) - k + 1)]
+                st.write(f"Fragmentos generados: `{kmers}`")
+                for km in kmers: st.write(f"Nodo `{km[:-1]}` ➔ Nodo `{km[1:]}`")
         if st.button("➡️ Siguiente: Filogenética"): ir_al_siguiente(); st.rerun()
 
     # --- SIMULADOR 5 ---
     elif simulador == "5. Distancia Filogenética Básica":
         st.header("5. Distancia Evolutiva")
-        st.info("Instrucciones: Compara dos secuencias. Calculamos la proporción de diferencias. ¡Cuanto más alto el porcentaje, más lejanas evolutivamente están las especies!")
-        s1 = st.text_input("Secuencia Especie 1:", "ATGC").upper()
-        s2 = st.text_input("Secuencia Especie 2:", "ATGG").upper()
+        st.info("INSTRUCCIONES: Compara dos especies ingresando sus secuencias de ADN. El simulador calculará la distancia genética porcentual entre ambas.")
+        s1 = st.text_input("Secuencia Especie 1:", value="")
+        s2 = st.text_input("Secuencia Especie 2:", value="")
         if s1 and s2 and len(s1)==len(s2):
             dist = sum(1 for a,b in zip(s1, s2) if a != b) / len(s1)
             st.metric("Distancia Genética", f"{dist:.2%}")
