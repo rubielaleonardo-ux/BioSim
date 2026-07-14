@@ -1,22 +1,21 @@
 import streamlit as st
 
 # --- CONFIGURACIÓN ---
-st.set_page_config(page_title="BioSim Educativo", layout="wide")
+st.set_page_config(page_title="BioSim: Laboratorio Virtual", layout="wide")
 
-# Inicialización del estado
+# --- ESTADO INICIAL ---
 if 'paso_actual' not in st.session_state:
     st.session_state.paso_actual = "1. Transcripción y Traducción"
+if 'secuencia_maestra' not in st.session_state:
+    st.session_state.secuencia_maestra = ""
 
-if 'inputs' not in st.session_state:
-    st.session_state.inputs = {
-        "1. Transcripción y Traducción": {},
-        "2. Mutaciones y Estructura Proteica": {},
-        "3. Matriz de Alineamiento Global": {},
-        "4. Gráficos de De Bruijn (Ensamble)": {},
-        "5. Distancia Filogenética Básica": {}
-    }
-
-pasos = list(st.session_state.inputs.keys())
+pasos = [
+    "1. Transcripción y Traducción",
+    "2. Mutaciones y Estructura Proteica",
+    "3. Matriz de Alineamiento Global",
+    "4. Gráficos de De Bruijn (Ensamble)",
+    "5. Distancia Filogenética Básica"
+]
 
 def navegar(direccion):
     idx = pasos.index(st.session_state.paso_actual)
@@ -25,101 +24,89 @@ def navegar(direccion):
     elif direccion == "atras" and idx > 0:
         st.session_state.paso_actual = pasos[idx - 1]
 
-# Diccionario completo
-codigo_genetico = {
-    'UUU': 'Fenilalanina', 'UUC': 'Fenilalanina', 'UUA': 'Leucina', 'UUG': 'Leucina', 
-    'UCU': 'Serina', 'UCC': 'Serina', 'UCA': 'Serina', 'UCG': 'Serina',
-    'UAU': 'Tirosina', 'UAC': 'Tirosina', 'UAA': 'STOP', 'UAG': 'STOP', 
-    'UGU': 'Cisteína', 'UGC': 'Cisteína', 'UGA': 'STOP', 'UGG': 'Triptófano',
-    'CUU': 'Leucina', 'CUC': 'Leucina', 'CUA': 'Leucina', 'CUG': 'Leucina', 
-    'CCU': 'Prolina', 'CCC': 'Prolina', 'CCA': 'Prolina', 'CCG': 'Prolina',
-    'CAU': 'Histidina', 'CAC': 'Histidina', 'CAA': 'Glutamina', 'CAG': 'Glutamina', 
-    'CGU': 'Arginina', 'CGC': 'Arginina', 'CGA': 'Arginina', 'CGG': 'Arginina',
-    'AUU': 'Isoleucina', 'AUC': 'Isoleucina', 'AUA': 'Isoleucina', 'AUG': 'Metionina (Inicio)', 
-    'ACU': 'Treonina', 'ACC': 'Treonina', 'ACA': 'Treonina', 'ACG': 'Treonina',
-    'AAU': 'Asparagina', 'AAC': 'Asparagina', 'AAA': 'Lisina', 'AAG': 'Lisina', 
-    'AGU': 'Serina', 'AGC': 'Serina', 'AGA': 'Arginina', 'AGG': 'Arginina',
-    'GUU': 'Valina', 'GUC': 'Valina', 'GUA': 'Valina', 'GUG': 'Valina', 
-    'GCU': 'Alanina', 'GCC': 'Alanina', 'GCA': 'Alanina', 'GCG': 'Alanina',
-    'GAU': 'Ácido Aspártico', 'GAC': 'Ácido Aspártico', 'GAA': 'Ácido Glutámico', 'GAG': 'Ácido Glutámico', 
-    'GGU': 'Glicina', 'GGC': 'Glicina', 'GGA': 'Glicina', 'GGG': 'Glicina'
+# Diccionario Genético
+codones = {
+    'UUU':'Fenilalanina','UUC':'Fenilalanina','UUA':'Leucina','UUG':'Leucina','UCU':'Serina',
+    'UCC':'Serina','UCA':'Serina','UCG':'Serina','UAU':'Tirosina','UAC':'Tirosina','UAA':'STOP',
+    'UAG':'STOP','UGU':'Cisteína','UGC':'Cisteína','UGA':'STOP','UGG':'Triptófano','CUU':'Leucina',
+    'CUC':'Leucina','CUA':'Leucina','CUG':'Leucina','CCU':'Prolina','CCC':'Prolina','CCA':'Prolina',
+    'CCG':'Prolina','CAU':'Histidina','CAC':'Histidina','CAA':'Glutamina','CAG':'Glutamina',
+    'CGU':'Arginina','CGC':'Arginina','CGA':'Arginina','CGG':'Arginina','AUU':'Isoleucina',
+    'AUC':'Isoleucina','AUA':'Isoleucina','AUG':'Metionina','ACU':'Treonina','ACC':'Treonina',
+    'ACA':'Treonina','ACG':'Treonina','AAU':'Asparagina','AAC':'Asparagina','AAA':'Lisina',
+    'AAG':'Lisina','AGU':'Serina','AGC':'Serina','AGA':'Arginina','AGG':'Arginina','GUU':'Valina',
+    'GUC':'Valina','GUA':'Valina','GUG':'Valina','GCU':'Alanina','GCC':'Alanina','GCA':'Alanina',
+    'GCG':'Alanina','GAU':'Ácido Aspártico','GAC':'Ácido Aspártico','GAA':'Ácido Glutámico',
+    'GAG':'Ácido Glutámico','GGU':'Glicina','GGC':'Glicina','GGA':'Glicina','GGG':'Glicina'
 }
 
-# --- BIENVENIDA ---
-st.title("🧬 BioSim: Simuladores Bioinformáticos")
-st.markdown("""
-Bienvenido al entorno de aprendizaje interactivo. La **Bioinformática** es una disciplina clave en la ciencia moderna, 
-que combina la biología, la informática y la estadística para analizar y comprender datos biológicos complejos, 
-permitiéndonos desde descifrar el código genético hasta entender la evolución de las especies.
-""")
+# --- INTERFAZ PRINCIPAL ---
+st.title("🧬 BioSim: Laboratorio Virtual")
+st.markdown("La **Bioinformática** integra biología y computación para descifrar los secretos de la vida.")
 
-# --- IDENTIFICACIÓN ---
-with st.expander("👋 ¡Haz clic aquí para identificarte!", expanded=True):
-    nombre = st.text_input("Nombre del Estudiante:")
-    nivel = st.selectbox("Nivel Escolar:", ["", "Secundaria", "Universidad"])
+with st.expander("👋 ¡Identifícate!", expanded=True):
+    nombre = st.text_input("Nombre:")
+    nivel = st.selectbox("Nivel:", ["", "Secundaria", "Universidad"])
 
 if nombre and nivel:
     st.sidebar.title("Navegación")
-    simulador = st.sidebar.radio("Selecciona un simulador:", pasos, index=pasos.index(st.session_state.paso_actual))
+    simulador = st.sidebar.radio("Ir a:", pasos, index=pasos.index(st.session_state.paso_actual))
     st.session_state.paso_actual = simulador
 
     # --- SIMULADOR 1 ---
     if simulador == "1. Transcripción y Traducción":
         st.header("1. Transcripción y Traducción")
-        adn = st.text_input("ADN (3' a 5'):", value=st.session_state.inputs[simulador].get("adn", ""))
-        st.session_state.inputs[simulador]["adn"] = adn
-        if adn:
+        seq = st.text_input("Ingresa ADN molde (3'-5'):", value=st.session_state.secuencia_maestra)
+        st.session_state.secuencia_maestra = seq.upper().replace(" ", "")
+        if st.session_state.secuencia_maestra:
             trans = {"A": "U", "T": "A", "C": "G", "G": "C"}
-            arn = "".join([trans.get(b, "") for b in adn.upper()])
+            arn = "".join([trans.get(b, "") for b in st.session_state.secuencia_maestra])
             st.success(f"ARNm: {arn}")
-            aa = [codigo_genetico.get(arn[i:i+3], "??") for i in range(0, len(arn)-2, 3)]
-            st.write(f"Polipéptido: {' - '.join(aa)}")
+            aa = [codones.get(arn[i:i+3], "??") for i in range(0, len(arn)-2, 3)]
+            st.write(f"Proteína: {' - '.join(aa)}")
 
     # --- SIMULADOR 2 ---
     elif simulador == "2. Mutaciones y Estructura Proteica":
         st.header("2. Impacto de Mutaciones")
-        sec = st.text_input("ARNm base:", value=st.session_state.inputs[simulador].get("sec", ""))
-        st.session_state.inputs[simulador]["sec"] = sec
-        if sec:
-            pos = st.slider("Posición:", 0, len(sec)-1, 0)
-            nuc = st.selectbox("Nuevo nucleótido:", ["A", "U", "C", "G"])
-            mut = list(sec); mut[pos] = nuc; mut_seq = "".join(mut)
-            st.warning(f"Mutada: {mut_seq}")
+        st.info(f"Secuencia Maestra: `{st.session_state.secuencia_maestra}`")
+        if st.session_state.secuencia_maestra:
+            pos = st.slider("Posición a mutar:", 0, len(st.session_state.secuencia_maestra)-1, 0)
+            nuc = st.selectbox("Nuevo nucleótido:", ["A", "T", "C", "G"])
+            mut = list(st.session_state.secuencia_maestra)
+            mut[pos] = nuc
+            st.warning(f"Secuencia Mutada: `{''.join(mut)}`")
 
     # --- SIMULADOR 3 ---
     elif simulador == "3. Matriz de Alineamiento Global":
         st.header("3. Matriz de Alineamiento")
-        s1 = st.text_input("Horizontal:", value=st.session_state.inputs[simulador].get("s1", ""))
-        s2 = st.text_input("Vertical:", value=st.session_state.inputs[simulador].get("s2", ""))
-        st.session_state.inputs[simulador].update({"s1": s1, "s2": s2})
+        s1 = st.text_input("Secuencia 1 (Horizontal):", value=st.session_state.secuencia_maestra)
+        s2 = st.text_input("Secuencia 2 (Vertical):", value=st.session_state.secuencia_maestra)
         if s1 and s2:
             st.table([[""] + ["-"] + list(s1)] + [[c2] + [5 if c1==c2 else -1 for c1 in ["-"]+list(s1)] for c2 in ["-"]+list(s2)])
 
     # --- SIMULADOR 4 ---
     elif simulador == "4. Gráficos de De Bruijn (Ensamble)":
         st.header("4. Ensamble de ADN")
-        seq = st.text_input("ADN:", value=st.session_state.inputs[simulador].get("seq", ""))
-        st.session_state.inputs[simulador]["seq"] = seq
-        if seq:
-            k = st.slider("k-mer:", 2, 5, 3)
-            kmers = [seq[i:i+k] for i in range(len(seq) - k + 1)]
-            st.write(f"Fragmentos: {kmers}")
+        k = st.slider("Tamaño de k-mer:", 2, 5, 3)
+        if st.session_state.secuencia_maestra:
+            kmers = [st.session_state.secuencia_maestra[i:i+k] for i in range(len(st.session_state.secuencia_maestra) - k + 1)]
+            st.write(f"Fragmentos: `{kmers}`")
 
     # --- SIMULADOR 5 ---
     elif simulador == "5. Distancia Filogenética Básica":
         st.header("5. Distancia Evolutiva")
-        s1 = st.text_input("Seq 1:", value=st.session_state.inputs[simulador].get("s1", ""))
-        s2 = st.text_input("Seq 2:", value=st.session_state.inputs[simulador].get("s2", ""))
-        st.session_state.inputs[simulador].update({"s1": s1, "s2": s2})
-        if s1 and s2 and len(s1)==len(s2):
-            st.metric("Distancia", f"{(sum(1 for a,b in zip(s1, s2) if a != b) / len(s1)):.2%}")
+        seq1 = st.text_input("Seq 1:", value=st.session_state.secuencia_maestra)
+        seq2 = st.text_input("Seq 2 (Especie distinta):", value="ATGCATGC")
+        if seq1 and seq2 and len(seq1)==len(seq2):
+            dist = sum(1 for a,b in zip(seq1, seq2) if a != b) / len(seq1)
+            st.metric("Distancia Genética", f"{dist:.2%}")
 
     # --- NAVEGACIÓN ---
     st.divider()
-    c1, c2 = st.columns([1, 5])
+    c1, c2 = st.columns(2)
     with c1: 
         if st.button("⬅️ Atrás"): navegar("atras"); st.rerun()
     with c2: 
         if st.button("Siguiente ➡️"): navegar("siguiente"); st.rerun()
 else:
-    st.info("⚠️ Identifícate arriba para habilitar los simuladores.")
+    st.warning("⚠️ Por favor, identifícate para acceder al laboratorio.")
