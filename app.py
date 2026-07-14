@@ -3,23 +3,21 @@ import streamlit as st
 # --- CONFIGURACIÓN ---
 st.set_page_config(page_title="BioSim Educativo", layout="wide")
 
-# Inicialización del estado persistente para navegación y datos
+# Inicialización del estado
 if 'paso_actual' not in st.session_state:
     st.session_state.paso_actual = "1. Transcripción y Traducción"
 
-pasos = [
-    "1. Transcripción y Traducción",
-    "2. Mutaciones y Estructura Proteica",
-    "3. Matriz de Alineamiento Global",
-    "4. Gráficos de De Bruijn (Ensamble)",
-    "5. Distancia Filogenética Básica"
-]
-
-# Inicializar almacenamiento para que los datos no se borren
 if 'inputs' not in st.session_state:
-    st.session_state.inputs = {paso: {} for paso in pasos}
+    st.session_state.inputs = {
+        "1. Transcripción y Traducción": {},
+        "2. Mutaciones y Estructura Proteica": {},
+        "3. Matriz de Alineamiento Global": {},
+        "4. Gráficos de De Bruijn (Ensamble)": {},
+        "5. Distancia Filogenética Básica": {}
+    }
 
-# Funciones de navegación
+pasos = list(st.session_state.inputs.keys())
+
 def navegar(direccion):
     idx = pasos.index(st.session_state.paso_actual)
     if direccion == "siguiente" and idx < len(pasos) - 1:
@@ -47,13 +45,22 @@ codigo_genetico = {
     'GGU': 'Glicina', 'GGC': 'Glicina', 'GGA': 'Glicina', 'GGG': 'Glicina'
 }
 
-# --- INTERFAZ ---
-st.title("🧬 BioSim: Laboratorio Virtual")
-nombre = st.sidebar.text_input("Nombre del Estudiante:")
+# --- BIENVENIDA ---
+st.title("🧬 BioSim: Simuladores Bioinformáticos")
+st.markdown("""
+Bienvenido al entorno de aprendizaje interactivo. La **Bioinformática** es una disciplina clave en la ciencia moderna, 
+que combina la biología, la informática y la estadística para analizar y comprender datos biológicos complejos, 
+permitiéndonos desde descifrar el código genético hasta entender la evolución de las especies.
+""")
 
-if nombre:
-    st.sidebar.write(f"Bienvenido, {nombre}")
-    simulador = st.sidebar.radio("Navegación:", pasos, index=pasos.index(st.session_state.paso_actual))
+# --- IDENTIFICACIÓN ---
+with st.expander("👋 ¡Haz clic aquí para identificarte!", expanded=True):
+    nombre = st.text_input("Nombre del Estudiante:")
+    nivel = st.selectbox("Nivel Escolar:", ["", "Secundaria", "Universidad"])
+
+if nombre and nivel:
+    st.sidebar.title("Navegación")
+    simulador = st.sidebar.radio("Selecciona un simulador:", pasos, index=pasos.index(st.session_state.paso_actual))
     st.session_state.paso_actual = simulador
 
     # --- SIMULADOR 1 ---
@@ -64,9 +71,9 @@ if nombre:
         if adn:
             trans = {"A": "U", "T": "A", "C": "G", "G": "C"}
             arn = "".join([trans.get(b, "") for b in adn.upper()])
-            st.write(f"**ARNm:** `{arn}`")
+            st.success(f"ARNm: {arn}")
             aa = [codigo_genetico.get(arn[i:i+3], "??") for i in range(0, len(arn)-2, 3)]
-            st.success(f"**Aminoácidos:** " + " - ".join(aa))
+            st.write(f"Polipéptido: {' - '.join(aa)}")
 
     # --- SIMULADOR 2 ---
     elif simulador == "2. Mutaciones y Estructura Proteica":
@@ -77,7 +84,7 @@ if nombre:
             pos = st.slider("Posición:", 0, len(sec)-1, 0)
             nuc = st.selectbox("Nuevo nucleótido:", ["A", "U", "C", "G"])
             mut = list(sec); mut[pos] = nuc; mut_seq = "".join(mut)
-            st.warning(f"Mutada: `{mut_seq}`")
+            st.warning(f"Mutada: {mut_seq}")
 
     # --- SIMULADOR 3 ---
     elif simulador == "3. Matriz de Alineamiento Global":
@@ -96,7 +103,7 @@ if nombre:
         if seq:
             k = st.slider("k-mer:", 2, 5, 3)
             kmers = [seq[i:i+k] for i in range(len(seq) - k + 1)]
-            st.write(f"Fragmentos: `{kmers}`")
+            st.write(f"Fragmentos: {kmers}")
 
     # --- SIMULADOR 5 ---
     elif simulador == "5. Distancia Filogenética Básica":
@@ -107,13 +114,12 @@ if nombre:
         if s1 and s2 and len(s1)==len(s2):
             st.metric("Distancia", f"{(sum(1 for a,b in zip(s1, s2) if a != b) / len(s1)):.2%}")
 
-    # --- BOTONES NAVEGACIÓN ---
+    # --- NAVEGACIÓN ---
     st.divider()
-    c1, c2 = st.columns(2)
+    c1, c2 = st.columns([1, 5])
     with c1: 
         if st.button("⬅️ Atrás"): navegar("atras"); st.rerun()
     with c2: 
         if st.button("Siguiente ➡️"): navegar("siguiente"); st.rerun()
-
 else:
-    st.info("⚠️ Ingresa tu nombre en el panel lateral para comenzar.")
+    st.info("⚠️ Identifícate arriba para habilitar los simuladores.")
