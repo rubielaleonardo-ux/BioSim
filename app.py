@@ -4,7 +4,8 @@ import streamlit as st
 st.set_page_config(page_title="BioSim: Laboratorio Virtual", layout="wide")
 
 # --- ESTADO INICIAL ---
-if 'sim_actual' not in st.session_state: st.session_state.sim_actual = "1. Transcripción y Traducción"
+if 'sim_actual' not in st.session_state: 
+    st.session_state.sim_actual = "1. Transcripción y Traducción"
 
 # --- DICCIONARIO DE CODONES ---
 codones = {'UUU':'Fenilalanina','UUC':'Fenilalanina','UUA':'Leucina','UUG':'Leucina','UCU':'Serina','UCC':'Serina','UCA':'Serina','UCG':'Serina','UAU':'Tirosina','UAC':'Tirosina','UAA':'STOP','UAG':'STOP','UGU':'Cisteína','UGC':'Cisteína','UGA':'STOP','UGG':'Triptófano','CUU':'Leucina','CUC':'Leucina','CUA':'Leucina','CUG':'Leucina','CCU':'Prolina','CCC':'Prolina','CCA':'Prolina','CCG':'Prolina','CAU':'Histidina','CAC':'Histidina','CAA':'Glutamina','CAG':'Glutamina','CGU':'Arginina','CGC':'Arginina','CGA':'Arginina','CGG':'Arginina','AUU':'Isoleucina','AUC':'Isoleucina','AUA':'Isoleucina','AUG':'Metionina','ACU':'Treonina','ACC':'Treonina','ACA':'Treonina','ACG':'Treonina','AAU':'Asparagina','AAC':'Asparagina','AAA':'Lisina','AAG':'Lisina','AGU':'Serina','AGC':'Serina','AGA':'Arginina','AGG':'Arginina','GUU':'Valina','GUC':'Valina','GUA':'Valina','GUG':'Valina','GCU':'Alanina','GCC':'Alanina','GCA':'Alanina','GCG':'Alanina','GAU':'Ácido Aspártico','GAC':'Ácido Aspártico','GAA':'Ácido Glutámico','GAG':'Ácido Glutámico','GGU':'Glicina','GGC':'Glicina','GGA':'Glicina','GGG':'Glicina'}
@@ -20,12 +21,6 @@ def calcular_distancia_hamming(seq1, seq2):
     if len(seq1) != len(seq2): return None
     return sum(1 for a, b in zip(seq1, seq2) if a != b)
 
-def navegar(direccion):
-    idx = simuladores.index(st.session_state.sim_actual)
-    if direccion == "siguiente" and idx < len(simuladores) - 1: st.session_state.sim_actual = simuladores[idx + 1]
-    elif direccion == "atras" and idx > 0: st.session_state.sim_actual = simuladores[idx - 1]
-    st.rerun()
-
 # --- INTERFAZ ---
 st.title("🧬 BioSim: Laboratorio Virtual")
 
@@ -38,11 +33,20 @@ if nombre and nivel:
     st.session_state.sim_actual = st.sidebar.radio("Selecciona módulo:", simuladores)
     st.sidebar.divider()
     
-    # --- MÓDULOS (Cada uno solicita su propia secuencia para evitar el bucle) ---
-    st.header(st.session_state.sim_actual)
+    # --- BOTONES DE NAVEGACIÓN SUPERIORES ---
+    c1, c2 = st.columns(2)
+    idx = simuladores.index(st.session_state.sim_actual)
     
-    # Campo de entrada local para cada módulo (evita que se arrastre el valor)
-    seq_input = st.text_input("Introduce secuencia de ADN para este módulo:", "ATGGCCCTGTGGATGCGCCT")
+    if c1.button("⬅️ Atrás") and idx > 0:
+        st.session_state.sim_actual = simuladores[idx - 1]
+        st.rerun()
+    if c2.button("Siguiente ➡️") and idx < len(simuladores) - 1:
+        st.session_state.sim_actual = simuladores[idx + 1]
+        st.rerun()
+
+    # --- CONTENIDO DEL MÓDULO ---
+    st.header(st.session_state.sim_actual)
+    seq_input = st.text_input("Introduce secuencia de ADN:", "ATGGCCCTGTGGATGCGCCT")
     seq = seq_input.upper().replace(" ", "")
 
     if st.session_state.sim_actual == "1. Transcripción y Traducción":
@@ -51,46 +55,35 @@ if nombre and nivel:
         st.subheader("📊 Informe de Resultados")
         st.success(f"ARNm completo: {arn}")
         st.write(f"**Proteína:** {' - '.join(aa)}")
-        st.info("Conclusión: La traducción ha finalizado exitosamente.")
 
     elif st.session_state.sim_actual == "2. Mutaciones y Estructura Proteica":
         arn_base = adn_a_arn(seq)
-        pos = st.slider("Posición en ARNm:", 0, len(arn_base)-1, 0)
+        pos = st.slider("Posición en ARNm:", 0, max(0, len(arn_base)-1), 0)
         nuc = st.selectbox("Cambiar a:", ["A", "U", "C", "G"])
         mut_arn = "".join([nuc if i == pos else b for i, b in enumerate(arn_base)])
         st.subheader("📊 Informe de Resultados")
         st.write(f"Original: `{arn_base}` | Mutado: `{mut_arn}`")
-        if arn_base != mut_arn:
-            st.error("Detección: Alteración confirmada en la estructura proteica.")
 
     elif st.session_state.sim_actual == "3. Matriz de Alineamiento Global":
         st.subheader("📊 Informe de Resultados")
         st.table([[""] + list(seq)] + [[seq[i]] + [5 if seq[i]==seq[j] else -2 for j in range(len(seq))] for i in range(len(seq))])
-        st.info("Conclusión: Valores positivos indican coincidencias.")
 
     elif st.session_state.sim_actual == "4. Gráficos de De Bruijn (Ensamble)":
         k = st.slider("Tamaño de k-mer:", 2, 5, 3)
-        kmers = set([seq[i:i+k] for i in range(len(seq) - k + 1)])
+        kmers = set([seq[i:i+k] for i in range(max(0, len(seq) - k + 1))])
         st.subheader("📊 Informe de Resultados")
         st.metric("Total de fragmentos únicos", len(kmers))
         st.write(f"Fragmentos: `{list(kmers)}`")
-        st.success("Conclusión: Genoma fragmentado para ensamblaje.")
 
     elif st.session_state.sim_actual == "5. Distancia Filogenética Básica":
-        seq2 = st.text_input("Introduce segunda secuencia para comparar:", "ATGCATGG")
+        seq2 = st.text_input("Introduce segunda secuencia:", "ATGCATGG")
         if st.button("Calcular Distancia"):
             dist = calcular_distancia_hamming(seq, seq2)
             st.subheader("📊 Informe de Resultados")
             if dist is not None:
                 st.metric("Distancia de Hamming", dist)
-                st.write(f"Interpretación: La divergencia de {dist} sugiere diferencias evolutivas.")
             else:
                 st.error("Error: Las secuencias deben tener la misma longitud.")
 
-    st.divider()
-    c1, c2 = st.columns(2)
-    if c1.button("⬅️ Atrás"): navegar("atras")
-    if c2.button("Siguiente ➡️"): navegar("siguiente")
-
 else:
-    st.warning("⚠️ Identifícate para comenzar tu práctica de bioinformática.")
+    st.warning("⚠️ Identifícate para comenzar.")
