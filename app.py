@@ -30,13 +30,13 @@ with st.expander("👋 ¡Identifícate para comenzar!"):
     nivel = st.selectbox("Nivel Escolar:", ["", "Secundaria", "Universidad"])
 
 if nombre and nivel:
-    # --- BARRA LATERAL CON SELECTOR DE CASOS ---
+    # Barra Lateral
     st.sidebar.title("Configuración")
     casos_estudio = {
         "Insulina (Conservación)": "ATGGCCCTGTGGATGCGCCT",
         "Resistencia (Variabilidad)": "ATGTCCGATCGTCTTGTCGT"
     }
-    selector = st.sidebar.selectbox("Elige un caso de estudio:", list(casos_estudio.keys()))
+    selector = st.sidebar.selectbox("Elige un caso:", list(casos_estudio.keys()))
     if st.sidebar.button("Cargar Secuencia"):
         st.session_state.secuencia_maestra = casos_estudio[selector]
         st.rerun()
@@ -51,9 +51,10 @@ if nombre and nivel:
         st.session_state.secuencia_maestra = seq.upper().replace(" ", "")
         if st.session_state.secuencia_maestra:
             arn = adn_a_arn(st.session_state.secuencia_maestra)
-            st.success(f"ARNm: {arn}")
-            aa = [codones.get(arn[i:i+3], "??") for i in range(0, len(arn)-2, 3)]
-            st.write(f"Proteína: {' - '.join(aa)}")
+            st.success(f"ARNm completo: {arn}")
+            aa = [codones.get(arn[i:i+3], f"({arn[i:i+3]})") for i in range(0, len(arn), 3)]
+            st.write(f"**Proteína:** {' - '.join(aa)}")
+            st.info("Resultado: Traducción finalizada con éxito.")
 
     elif st.session_state.sim_actual == "2. Mutaciones y Estructura Proteica":
         st.header("2. Impacto de Mutaciones")
@@ -62,21 +63,32 @@ if nombre and nivel:
         nuc = st.selectbox("Cambiar a:", ["A", "U", "C", "G"])
         mut = list(arn_base); mut[pos] = nuc; mut_arn = "".join(mut)
         st.warning(f"ARNm Mutado: `{mut_arn}`")
+        aa_orig = [codones.get(arn_base[i:i+3], "?") for i in range(0, len(arn_base), 3)]
+        aa_mut = [codones.get(mut_arn[i:i+3], "?") for i in range(0, len(mut_arn), 3)]
+        st.write(f"**Comparativa Proteica:**")
+        st.write(f"Original: {aa_orig}")
+        st.write(f"Mutado:   {aa_mut}")
+        if aa_orig != aa_mut: st.error("Resultado: La mutación alteró la estructura proteica.")
 
     elif st.session_state.sim_actual == "3. Matriz de Alineamiento Global":
         st.header("3. Matriz de Alineamiento")
-        st.table([[""] + ["-"] + list(st.session_state.secuencia_maestra)] + [[c2] + [5 if c1==c2 else -1 for c1 in ["-"]+list(st.session_state.secuencia_maestra)] for c2 in ["-"]+list("ATGC")])
+        seq = st.session_state.secuencia_maestra
+        st.table([[""] + list(seq)] + [[seq[i]] + [5 if seq[i]==seq[j] else -2 for j in range(len(seq))] for i in range(len(seq))])
+        st.success(f"Resultado: Matriz de identidad de {len(seq)}x{len(seq)} generada.")
 
     elif st.session_state.sim_actual == "4. Gráficos de De Bruijn (Ensamble)":
         st.header("4. Ensamble de ADN")
         k = st.slider("Tamaño de k-mer:", 2, 5, 3)
         kmers = [st.session_state.secuencia_maestra[i:i+k] for i in range(len(st.session_state.secuencia_maestra) - k + 1)]
-        st.write(f"Fragmentos: `{kmers}`")
+        st.write(f"Fragmentos obtenidos: `{list(set(kmers))}`")
+        st.success(f"Resultado: Se ensamblaron {len(set(kmers))} fragmentos únicos.")
 
     elif st.session_state.sim_actual == "5. Distancia Filogenética Básica":
         st.header("5. Distancia Evolutiva")
-        dist = sum(1 for a,b in zip(st.session_state.secuencia_maestra, "ATGCATGC") if a != b) / len(st.session_state.secuencia_maestra) if st.session_state.secuencia_maestra else 0
+        ref = "ATGCATGCATGCATGCATGC"
+        dist = sum(1 for a,b in zip(st.session_state.secuencia_maestra, ref) if a != b) / len(st.session_state.secuencia_maestra)
         st.metric("Distancia Genética", f"{dist:.2%}")
+        st.info("Resultado: Distancia calculada respecto a secuencia de referencia.")
 
     # --- NAVEGACIÓN INFERIOR ---
     st.divider()
