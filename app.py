@@ -42,50 +42,59 @@ with st.expander("👋 ¡Identifícate para comenzar!"):
 if nombre and nivel:
     st.sidebar.title("Navegación")
     st.session_state.sim_actual = st.sidebar.radio("Ir a:", simuladores, index=simuladores.index(st.session_state.sim_actual))
-    
-    # Campo global para mantener la coherencia de la secuencia en los módulos
     st.session_state.secuencia_maestra = st.text_input("Secuencia de ADN de trabajo:", st.session_state.secuencia_maestra).upper().replace(" ", "")
 
-    # --- SIMULADORES ---
+    # --- SIMULADOR 1 ---
     if st.session_state.sim_actual == "1. Transcripción y Traducción":
         st.header("1. Transcripción y Traducción")
+        st.subheader("🎯 Objetivo: Convertir ADN en proteína.")
         if st.session_state.secuencia_maestra:
             arn = adn_a_arn(st.session_state.secuencia_maestra)
             st.success(f"ARNm: {arn}")
             aa = [codones.get(arn[i:i+3], "??") for i in range(0, len(arn)-2, 3)]
             st.write(f"**Proteína:** {' - '.join(aa)}")
+            st.info("Explicación: El ADN se transcribe a ARNm. Luego, el ribosoma lee codones de 3 letras para ensamblar los aminoácidos de la proteína.")
 
+    # --- SIMULADOR 2 ---
     elif st.session_state.sim_actual == "2. Mutaciones y Estructura Proteica":
         st.header("2. Impacto de Mutaciones")
+        st.subheader("🎯 Objetivo: Observar cambios tras una mutación.")
         arn_base = adn_a_arn(st.session_state.secuencia_maestra)
         if arn_base:
             pos = st.slider("Posición en ARNm:", 0, len(arn_base)-1, 0)
             nuc = st.selectbox("Cambiar a:", ["A", "U", "C", "G"])
-            mut = list(arn_base); mut[pos] = nuc; mut_arn = "".join(mut)
+            mut_arn = arn_base[:pos] + nuc + arn_base[pos+1:]
             st.warning(f"ARNm Mutado: `{mut_arn}`")
+            st.info("Explicación: Las mutaciones alteran la secuencia codificante. Un cambio puntual puede generar un codón STOP prematuro o alterar la función proteica.")
 
+    # --- SIMULADOR 3 ---
     elif st.session_state.sim_actual == "3. Matriz de Alineamiento Global":
         st.header("3. Matriz de Alineamiento")
+        st.subheader("🎯 Objetivo: Visualizar similitud entre secuencias.")
         st.table([[""] + list(st.session_state.secuencia_maestra)] + [[c2] + [5 if c1==c2 else -1 for c1 in list(st.session_state.secuencia_maestra)] for c2 in ["A","T","G","C"]])
+        st.info("Explicación: La matriz comparativa ayuda a identificar regiones de alta homología mediante el puntaje de coincidencias en las diagonales.")
 
+    # --- SIMULADOR 4 ---
     elif st.session_state.sim_actual == "4. Gráficos de De Bruijn (Ensamble)":
         st.header("4. Ensamble de ADN")
+        st.subheader("🎯 Objetivo: Reconstruir genoma mediante k-mers.")
         k = st.slider("Tamaño de k-mer:", 2, 5, 3)
         kmers = [st.session_state.secuencia_maestra[i:i+k] for i in range(len(st.session_state.secuencia_maestra) - k + 1)]
         st.write(f"Fragmentos: `{kmers}`")
+        st.info("Explicación: Al fragmentar el ADN en k-mers, podemos utilizar grafos de De Bruijn para unir los solapamientos y reconstruir la secuencia original.")
 
+    # --- SIMULADOR 5 ---
     elif st.session_state.sim_actual == "5. Distancia Filogenética Básica":
         st.header("5. Distancia Evolutiva y Árbol")
-        especies_db = {
-            "Drosophila melanogaster": "ATGGCCCTGTGG",
-            "Arabidopsis thaliana": "ATGTCCGATCGT",
-            "Caenorhabditis elegans": "ATGGGCCTAGGG"
-        }
-        seq_usuario = st.session_state.secuencia_maestra
-        if seq_usuario:
-            distancias = {esp: sum(1 for a, b in zip(seq_usuario, seq_ref)) / len(seq_ref) for esp, seq_ref in especies_db.items()}
-            st.bar_chart(distancias)
-            st.success(f"Especie más cercana: **{min(distancias, key=distancias.get)}**")
+        st.subheader("🎯 Objetivo: Determinar parentesco evolutivo.")
+        especies_db = {"Drosophila melanogaster (Mosca)": "ATGGCCCTGTGG", "Arabidopsis thaliana (Planta)": "ATGTCCGATCGT", "Caenorhabditis elegans (Gusano)": "ATGGGCCTAGGG"}
+        seq_usuario = st.session_state.secuencia_maestra[:12]
+        distancias = {esp: sum(1 for a, b in zip(seq_usuario, seq_ref) if a != b) for esp, seq_ref in especies_db.items()}
+        ordenados = sorted(distancias.items(), key=lambda x: x[1])
+        for i, (esp, dist) in enumerate(ordenados):
+            st.write(f"{'  ' * i}└── **{esp}** (Diferencias: {dist})")
+        st.success(f"El organismo más cercano es: **{ordenados[0][0]}**.")
+        st.info("Explicación: Menos diferencias sugieren un ancestro común más reciente en el árbol de la vida.")
 
     # --- NAVEGACIÓN ---
     st.divider()
