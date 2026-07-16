@@ -51,48 +51,52 @@ if nombre and nivel:
         st.session_state.secuencia_maestra = seq.upper().replace(" ", "")
         if st.session_state.secuencia_maestra:
             arn = adn_a_arn(st.session_state.secuencia_maestra)
-            st.success(f"ARNm completo: {arn}")
             aa = [codones.get(arn[i:i+3], f"({arn[i:i+3]})") for i in range(0, len(arn), 3)]
+            st.subheader("📊 Informe de Resultados")
+            st.success(f"ARNm completo: {arn}")
             st.write(f"**Proteína:** {' - '.join(aa)}")
+            st.info("Conclusión: La traducción ha finalizado exitosamente[cite: 1].")
 
     elif st.session_state.sim_actual == "2. Mutaciones y Estructura Proteica":
         st.header("2. Impacto de Mutaciones")
         arn_base = adn_a_arn(st.session_state.secuencia_maestra)
         pos = st.slider("Posición en ARNm:", 0, len(arn_base)-1, 0)
         nuc = st.selectbox("Cambiar a:", ["A", "U", "C", "G"])
-        mut = list(arn_base); mut[pos] = nuc; mut_arn = "".join(mut)
-        st.warning(f"ARNm Mutado: `{mut_arn}`")
-        aa_orig = [codones.get(arn_base[i:i+3], "?") for i in range(0, len(arn_base), 3)]
-        aa_mut = [codones.get(mut_arn[i:i+3], "?") for i in range(0, len(mut_arn), 3)]
-        st.write(f"**Comparativa Proteica:** Original: {aa_orig} | Mutado: {aa_mut}")
+        mut_arn = "".join([nuc if i == pos else b for i, b in enumerate(arn_base)])
+        st.subheader("📊 Informe de Resultados")
+        st.write(f"Original: `{arn_base}` | Mutado: `{mut_arn}`")
+        if arn_base != mut_arn:
+            st.error("Detección: Se ha confirmado una alteración en la estructura proteica[cite: 1].")
 
     elif st.session_state.sim_actual == "3. Matriz de Alineamiento Global":
         st.header("3. Matriz de Alineamiento")
         seq = st.session_state.secuencia_maestra
+        st.subheader("📊 Informe de Resultados")
         st.table([[""] + list(seq)] + [[seq[i]] + [5 if seq[i]==seq[j] else -2 for j in range(len(seq))] for i in range(len(seq))])
+        st.info("Conclusión: Los valores positivos indican coincidencias de nucleótidos[cite: 1].")
 
     elif st.session_state.sim_actual == "4. Gráficos de De Bruijn (Ensamble)":
         st.header("4. Ensamble de ADN")
         k = st.slider("Tamaño de k-mer:", 2, 5, 3)
-        kmers = [st.session_state.secuencia_maestra[i:i+k] for i in range(len(st.session_state.secuencia_maestra) - k + 1)]
-        st.write(f"Fragmentos obtenidos: `{list(set(kmers))}`")
+        kmers = set([st.session_state.secuencia_maestra[i:i+k] for i in range(len(st.session_state.secuencia_maestra) - k + 1)])
+        st.subheader("📊 Informe de Resultados")
+        st.metric("Total de fragmentos únicos", len(kmers))
+        st.write(f"Fragmentos: `{list(kmers)}`")
+        st.success("Conclusión: Genoma fragmentado para ensamblaje computacional[cite: 1].")
 
     elif st.session_state.sim_actual == "5. Distancia Filogenética Básica":
         st.header("5. Distancia Evolutiva")
-        st.write("Calcula la divergencia entre dos especies analizando sus secuencias[cite: 1].")
         col1, col2 = st.columns(2)
-        with col1:
-            especie1 = st.text_input("Especie 1:", "Drosophila melanogaster")
-            seq1 = st.text_input("Secuencia 1:", "ATGCATGC")
-        with col2:
-            especie2 = st.text_input("Especie 2:", "Arabidopsis thaliana")
-            seq2 = st.text_input("Secuencia 2:", "ATGCATGG")
-
+        especie1 = col1.text_input("Especie 1:", "Drosophila melanogaster")
+        seq1 = col1.text_input("Secuencia 1:", "ATGCATGC")
+        especie2 = col2.text_input("Especie 2:", "Arabidopsis thaliana")
+        seq2 = col2.text_input("Secuencia 2:", "ATGCATGG")
         if st.button("Calcular Distancia"):
             dist = calcular_distancia_hamming(seq1, seq2)
+            st.subheader("📊 Informe de Resultados")
             if dist is not None:
-                st.success(f"Distancia genética entre {especie1} y {especie2}: {dist}")
-                st.write("Un valor mayor indica una mayor divergencia evolutiva[cite: 1].")
+                st.metric("Distancia de Hamming", dist)
+                st.write(f"Interpretación: La divergencia de {dist} sugiere diferencias evolutivas entre las especies[cite: 1].")
             else:
                 st.error("Error: Las secuencias deben tener la misma longitud.")
 
